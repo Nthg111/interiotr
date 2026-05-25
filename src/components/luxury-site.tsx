@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Lenis from "lenis";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   AnimatePresence,
   motion,
@@ -63,6 +65,14 @@ type GalleryItem = {
   category: "Residential" | "Commercial" | "Materials";
   note: string;
   accent: string;
+};
+
+type ProcessStep = {
+  title: string;
+  description: string;
+  material: string;
+  detail: string;
+  texture: string;
 };
 
 const services: Service[] = [
@@ -151,30 +161,48 @@ const projects: Project[] = [
   },
 ];
 
-const processSteps = [
+const processSteps: ProcessStep[] = [
   {
     title: "Consultation",
     description: "We define intent, budget, use-case, and the level of finish expected.",
+    material: "Program Brief",
+    detail: "Lifestyle mapping, budget architecture, and narrative goals.",
+    texture: "from-stone-900/70 via-zinc-900/55 to-amber-900/45",
   },
   {
     title: "Design",
     description: "Moodboards, layouts, and material studies evolve into a cohesive direction.",
+    material: "Spatial Composition",
+    detail: "Concept boards, zoning logic, and curated visual rhythm.",
+    texture: "from-neutral-900/70 via-zinc-900/60 to-stone-800/45",
   },
   {
     title: "Material Selection",
     description: "Stone, timber, fabrics, and finishes are curated with a premium eye.",
+    material: "Material Library",
+    detail: "Tactile swatches tuned for longevity, tone, and maintenance.",
+    texture: "from-amber-900/60 via-stone-900/60 to-zinc-900/55",
   },
   {
     title: "Execution",
     description: "Site coordination, fabrication, and installation are handled with precision.",
+    material: "Site Orchestration",
+    detail: "Trades, production, and sequencing controlled in one flow.",
+    texture: "from-zinc-900/75 via-stone-900/55 to-neutral-900/65",
   },
   {
     title: "Quality Check",
     description: "Every junction, finish, and line is inspected before delivery is accepted.",
+    material: "Detail Audit",
+    detail: "Surface alignment, tolerance checks, and finish consistency.",
+    texture: "from-stone-900/65 via-neutral-900/65 to-zinc-800/45",
   },
   {
     title: "Delivery",
     description: "A finished interior is handed over ready for immediate use and longevity.",
+    material: "Final Reveal",
+    detail: "Walkthrough, handover documentation, and aftercare briefing.",
+    texture: "from-amber-900/55 via-stone-900/55 to-neutral-900/75",
   },
 ];
 
@@ -325,6 +353,13 @@ export function LuxurySite() {
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [activeProcessStep, setActiveProcessStep] = useState(0);
+  const [processScrollProgress, setProcessScrollProgress] = useState(0);
+  const processSectionRef = useRef<HTMLElement | null>(null);
+  const processViewportRef = useRef<HTMLDivElement | null>(null);
+  const processTrackRef = useRef<HTMLDivElement | null>(null);
+  const processActiveRef = useRef(0);
+  const processProgressRef = useRef(0);
   const [selectedGalleryFilter, setSelectedGalleryFilter] = useState<(typeof galleryFilters)[number]>("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [split, setSplit] = useState(56);
@@ -371,6 +406,68 @@ export function LuxurySite() {
       setActiveTestimonial((value) => (value + 1) % testimonials.length);
     }, 6500);
     return () => window.clearInterval(ticker);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    const section = processSectionRef.current;
+    const viewport = processViewportRef.current;
+    const track = processTrackRef.current;
+
+    if (!section || !viewport || !track) return;
+
+    const getTravel = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
+
+    const st = ScrollTrigger.create({
+      trigger: section,
+      start: "top top",
+      end: () => `+=${Math.max(2200, processSteps.length * 640)}`,
+      pin: true,
+      scrub: 1,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
+      onUpdate(self) {
+        const nextProgress = self.progress;
+        if (Math.abs(nextProgress - processProgressRef.current) > 0.002) {
+          processProgressRef.current = nextProgress;
+          setProcessScrollProgress(nextProgress);
+        }
+
+        const nextActive = Math.min(
+          processSteps.length - 1,
+          Math.round(nextProgress * (processSteps.length - 1)),
+        );
+        if (nextActive !== processActiveRef.current) {
+          processActiveRef.current = nextActive;
+          setActiveProcessStep(nextActive);
+        }
+      },
+    });
+
+    const tween = gsap.to(track, {
+      x: () => -getTravel(),
+      ease: "none",
+      scrollTrigger: st,
+    });
+
+    const parallax = gsap.to(section.querySelectorAll("[data-process-parallax]"), {
+      yPercent: -10,
+      ease: "none",
+      scrollTrigger: {
+        trigger: section,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1,
+      },
+    });
+
+    return () => {
+      tween.kill();
+      parallax.kill();
+      st.kill();
+    };
   }, []);
 
   const themeIsDark = resolvedTheme ? resolvedTheme === "dark" : true;
@@ -888,62 +985,76 @@ export function LuxurySite() {
           </div>
         </section>
 
-        <section className="py-10 sm:py-20">
-          <SectionShell
-            eyebrow="Process"
-            title="A six-step timeline designed for calm, premium delivery."
-            description="The sequence feels architectural and legible, so clients and contractors understand exactly where the project stands."
-          />
+        <section ref={processSectionRef as any} className="relative h-screen">
+          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
+            <SectionShell
+              eyebrow="Process"
+              title="A six-step timeline designed for calm, premium delivery."
+              description="Scroll through a cinematic, horizontal journey — one active step at a time."
+            />
+          </div>
 
-          <div className="mx-auto mt-10 max-w-7xl px-6 sm:px-8 lg:px-10">
-            <Card className="overflow-hidden bg-white/[0.05] p-6 sm:p-8">
-              <div className="relative grid gap-6 lg:grid-cols-6 lg:gap-0">
-                <div className="absolute left-[2.25rem] top-8 block h-[calc(100%-4rem)] w-px bg-[linear-gradient(180deg,rgba(255,255,255,0.18),rgba(199,166,110,0.8),rgba(255,255,255,0.18))] lg:hidden" />
-                {processSteps.map((step, index) => (
-                  <Reveal key={step.title} delay={index * 0.06}>
+          <div className="relative mt-6 h-[calc(100vh-6.5rem)] w-full">
+            <div className="absolute left-0 right-0 top-6 z-20 px-6">
+              <div className="mx-auto max-w-7xl">
+                <div className="relative h-1 rounded-full bg-[color:var(--border)]/30">
+                  <div
+                    aria-hidden
+                    className="absolute left-0 top-0 h-full rounded-full bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.95),rgba(255,255,255,0.9))]"
+                    style={{ width: `${Math.round(processScrollProgress * 100)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              ref={processViewportRef as any}
+              className="relative z-10 mx-auto mt-12 h-full max-w-full overflow-hidden px-6"
+            >
+              <div
+                ref={processTrackRef as any}
+                className="flex h-full items-center gap-8 py-8"
+              >
+                {processSteps.map((step, index) => {
+                  const isActive = index === activeProcessStep;
+                  return (
                     <motion.div
-                      className="relative pl-14 lg:pl-0 lg:pt-2"
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.35 }}
-                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: index * 0.06 }}
-                      whileHover={{ y: -4 }}
+                      key={step.title}
+                      className={`relative min-w-[20rem] max-w-md flex-shrink-0 transform-gpu rounded-[1.5rem] border border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(10,10,10,0.4))] p-6 shadow-[0_24px_64px_-32px_rgba(0,0,0,0.8)]`}
+                      initial={{ opacity: 0.9 }}
+                      animate={{
+                        scale: isActive ? 1.04 : 1,
+                        opacity: isActive ? 1 : 0.72,
+                        filter: isActive ? "none" : "grayscale(0.18) brightness(0.88)",
+                      }}
+                      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                      whileHover={{ y: -6 }}
                     >
-                      <motion.div
-                        className="absolute left-0 top-1 flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--background)] text-xs font-semibold text-[color:var(--accent)] lg:top-0 lg:-translate-x-1/2"
-                        animate={{ scale: [1, 1.04, 1] }}
-                        transition={{
-                          duration: 5,
-                          repeat: Number.POSITIVE_INFINITY,
-                          ease: "easeInOut",
-                          delay: index * 0.15,
-                        }}
-                      >
-                        {String(index + 1).padStart(2, "0")}
-                      </motion.div>
-                      <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-white/5 p-5 transition-colors duration-300 lg:min-h-[15rem] hover:border-[color:var(--accent)]/30">
-                        <motion.div
-                          className="mb-4 h-px w-full bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.85),transparent)] lg:hidden"
-                          initial={{ scaleX: 0, opacity: 0 }}
-                          whileInView={{ scaleX: 1, opacity: 1 }}
-                          viewport={{ once: true, amount: 0.35 }}
-                          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: index * 0.06 + 0.1 }}
-                        />
-                        <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--muted)]">
-                          Step
-                        </p>
-                        <h3 className="mt-4 font-display text-2xl text-[color:var(--foreground)]">
-                          {step.title}
-                        </h3>
-                        <p className="mt-4 text-sm leading-7 text-[color:var(--muted)]">
-                          {step.description}
-                        </p>
+                      <div className="pointer-events-none absolute inset-0 rounded-[1.25rem] bg-[radial-gradient(closest-side,rgba(199,166,110,0.06),transparent_40%)] opacity-40" data-process-parallax />
+
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-4">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--background)] text-sm font-semibold text-[color:var(--accent)]">
+                            {String(index + 1).padStart(2, "0")}
+                          </div>
+                          <div>
+                            <p className="text-xs uppercase tracking-[0.32em] text-[color:var(--muted)]">Step</p>
+                            <h3 className="mt-2 font-display text-2xl text-[color:var(--foreground)]">{step.title}</h3>
+                          </div>
+                        </div>
+
+                        <p className="mt-4 text-sm leading-7 text-[color:var(--muted)]">{step.description}</p>
+
+                        <div className="mt-4 flex items-center gap-3">
+                          <span className="rounded-full border border-[color:var(--border)] bg-white/3 px-3 py-1 text-xs text-[color:var(--muted)]">{step.material}</span>
+                          <span className="text-sm text-[color:var(--muted)]">{step.detail}</span>
+                        </div>
                       </div>
                     </motion.div>
-                  </Reveal>
-                ))}
+                  );
+                })}
               </div>
-            </Card>
+            </div>
           </div>
         </section>
 
