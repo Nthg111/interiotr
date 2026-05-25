@@ -353,6 +353,7 @@ export function LuxurySite() {
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const lenisRef = useRef<any>(null);
   const [activeProcessStep, setActiveProcessStep] = useState(0);
   const [processScrollProgress, setProcessScrollProgress] = useState(0);
   const processSectionRef = useRef<HTMLElement | null>(null);
@@ -379,16 +380,18 @@ export function LuxurySite() {
   useEffect(() => {
     const mountFrame = requestAnimationFrame(() => setMounted(true));
 
-    const lenis = new Lenis({
+    lenisRef.current = new Lenis({
       duration: 1.1,
-      easing: (t) => 1 - Math.pow(1 - t, 3),
+      easing: (t: number) => 1 - Math.pow(1 - t, 3),
       smoothWheel: true,
       touchMultiplier: 1.5,
     });
 
     let frame = 0;
     const raf = (time: number) => {
-      lenis.raf(time);
+      lenisRef.current.raf(time);
+      // ensure ScrollTrigger sees updates when Lenis animates
+      if ((window as any).ScrollTrigger) (window as any).ScrollTrigger.update();
       frame = requestAnimationFrame(raf);
     };
 
@@ -397,7 +400,9 @@ export function LuxurySite() {
     return () => {
       cancelAnimationFrame(mountFrame);
       cancelAnimationFrame(frame);
-      lenis.destroy();
+      try {
+        lenisRef.current?.destroy();
+      } catch (e) {}
     };
   }, []);
 
@@ -417,6 +422,34 @@ export function LuxurySite() {
     const track = processTrackRef.current;
 
     if (!section || !viewport || !track) return;
+
+    // If Lenis is active, wire ScrollTrigger to it so GSAP stays in sync with smooth scrolling
+    const lenis = (lenisRef as any).current;
+    if (lenis) {
+      try {
+        ScrollTrigger.scrollerProxy(document.documentElement, {
+          scrollTop(value: number) {
+            if (arguments.length) {
+              // scrollTo with zero duration to immediately set when requested
+              if (typeof lenis.scrollTo === "function") lenis.scrollTo(value, { duration: 0 });
+              else if (typeof lenis.scroll === "object" && lenis.scroll.set) lenis.scroll.set(value);
+              return;
+            }
+            // try to return current Lenis scroll position, fallback to window
+            return (lenis && lenis.scroll && (lenis.scroll.instance?.scroll?.y ?? lenis.scroll.y)) || window.scrollY;
+          },
+          getBoundingClientRect() {
+            return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
+          },
+          pinType: document.documentElement.style.transform ? "transform" : "fixed",
+        });
+
+        // ensure ScrollTrigger updates when Lenis notifies
+        if (typeof lenis.on === "function") lenis.on("scroll", () => ScrollTrigger.update());
+      } catch (e) {
+        // ignore scroller proxy errors
+      }
+    }
 
     const getTravel = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
 
