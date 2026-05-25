@@ -555,27 +555,22 @@ export function LuxurySite() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.8, ease: "easeOut" } }}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(199,166,110,0.18),transparent_36%),radial-gradient(circle_at_75%_35%,rgba(255,255,255,0.1),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(12,11,10,1),rgba(20,17,14,1)_45%,rgba(12,11,10,1))]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(199,166,110,0.18),transparent_34%),radial-gradient(circle_at_78%_30%,rgba(255,255,255,0.08),transparent_22%)]" />
             <motion.div
               aria-hidden
-              className="absolute left-[-8rem] top-[-6rem] h-[26rem] w-[26rem] rounded-full bg-[color:var(--accent)]/10 blur-3xl"
-              animate={{ scale: [1, 1.12, 1], x: [0, 24, 0], y: [0, 16, 0] }}
-              transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-            />
-            <motion.div
-              aria-hidden
-              className="absolute bottom-[-8rem] right-[-4rem] h-[30rem] w-[30rem] rounded-full bg-white/5 blur-3xl"
-              animate={{ scale: [1, 0.92, 1], x: [0, -20, 0], y: [0, -14, 0] }}
-              transition={{ duration: 12, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+              className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.18),rgba(199,166,110,0.75),rgba(255,255,255,0.9),rgba(199,166,110,0.75),rgba(199,166,110,0.18),transparent)]"
+              animate={{ opacity: [0.55, 1, 0.55] }}
+              transition={{ duration: 2.4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
             />
 
             <div className="relative mx-auto w-full max-w-7xl px-6">
-              <div className="grid items-center gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:gap-12">
+              <div className="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
                 <motion.div
                   className="space-y-6 text-center lg:text-left"
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={{ opacity: 0, y: 22 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border border-[color:var(--border)] bg-white/5 text-2xl font-semibold tracking-[0.35em] text-[color:var(--accent)] backdrop-blur-xl lg:mx-0">
                     ITA
@@ -588,146 +583,126 @@ export function LuxurySite() {
                       From brief to handover
                     </h1>
                     <p className="mx-auto max-w-xl text-sm leading-7 text-[color:var(--muted)] lg:mx-0 sm:text-base">
-                      Handshake, blueprint, site movement, tools, materials, and final reveal in one
-                      short cinematic sequence before the page enters.
+                      A single animated path from handshake to site work to final output.
                     </p>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-                    {[
-                      "Handshake",
-                      "Blueprint",
-                      "Site move",
-                      "Tools + materials",
-                      "Final reveal",
-                    ].map((label, index) => (
-                      <motion.span
-                        key={label}
-                        className="rounded-full border border-[color:var(--border)] bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.28em] text-[color:var(--foreground)]/85 backdrop-blur-xl"
-                        animate={{ y: [0, -4, 0], opacity: [0.82, 1, 0.82] }}
-                        transition={{
-                          duration: 3.2,
-                          repeat: Number.POSITIVE_INFINITY,
-                          ease: "easeInOut",
-                          delay: index * 0.18,
-                        }}
-                      >
-                        {label}
-                      </motion.span>
-                    ))}
                   </div>
                 </motion.div>
 
                 <div className="relative">
-                  <div className="absolute inset-0 rounded-[2.5rem] bg-[radial-gradient(circle_at_20%_20%,rgba(199,166,110,0.16),transparent_30%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.08),transparent_24%)] blur-2xl" />
-                  <div className="relative overflow-hidden rounded-[2.25rem] border border-[color:var(--border)] bg-white/5 p-5 shadow-[0_30px_100px_-60px_rgba(0,0,0,0.9)] backdrop-blur-2xl sm:p-6">
+                  <div className="absolute inset-0 rounded-[2.5rem] bg-[radial-gradient(circle_at_20%_20%,rgba(199,166,110,0.14),transparent_30%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.08),transparent_24%)] blur-2xl" />
+                  <div className="relative overflow-hidden rounded-[2.25rem] border border-[color:var(--border)] bg-black/35 p-5 shadow-[0_30px_100px_-60px_rgba(0,0,0,0.9)] sm:p-6">
                     <div className="flex items-center justify-between gap-4">
                       <div>
                         <p className="text-xs uppercase tracking-[0.34em] text-[color:var(--muted)]">
                           Intro sequence
                         </p>
                         <p className="mt-2 font-display text-2xl text-[color:var(--foreground)]">
-                          Motion roadmap for a build story.
+                          One route, six beats.
                         </p>
                       </div>
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--border)] bg-black/20 text-[color:var(--accent)]">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--border)] bg-white/5 text-[color:var(--accent)]">
                         <SlidersHorizontal className="h-5 w-5" />
                       </div>
                     </div>
 
-                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                      {introScenes.map((scene, index) => {
-                        const SceneIcon = scene.icon;
-                        const isActive = index === introPhase;
-                        return (
-                          <motion.div
-                            key={scene.title}
-                            className={`rounded-[1.5rem] border p-4 text-left shadow-[0_20px_40px_-30px_rgba(0,0,0,0.7)] ${
-                              isActive
-                                ? "border-[color:var(--accent)]/45 bg-[color:var(--accent)]/12"
-                                : "border-[color:var(--border)] bg-white/5"
-                            }`}
-                            animate={{
-                              y: isActive ? [0, -6, 0] : [0, -2, 0],
-                              scale: isActive ? [1, 1.03, 1] : [1, 1, 1],
-                            }}
-                            transition={{
-                              duration: isActive ? 2.4 : 3.6,
-                              repeat: Number.POSITIVE_INFINITY,
-                              ease: "easeInOut",
-                              delay: index * 0.14,
-                            }}
-                          >
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex items-center gap-3">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-black/20 text-[color:var(--accent)]">
-                                  <SceneIcon className="h-5 w-5" />
-                                </div>
-                                <div>
-                                  <p className="text-[0.65rem] uppercase tracking-[0.3em] text-[color:var(--muted)]">
-                                    {scene.badge}
-                                  </p>
-                                  <h2 className="mt-2 font-display text-xl text-[color:var(--foreground)]">
-                                    {scene.title}
-                                  </h2>
-                                </div>
-                              </div>
-                              <span className="text-xs uppercase tracking-[0.3em] text-[color:var(--muted)]">
-                                {String(index + 1).padStart(2, "0")}
-                              </span>
-                            </div>
-                            <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">
-                              {scene.subtitle}
-                            </p>
-                          </motion.div>
-                        );
-                      })}
+                    <div className="relative mt-6 h-[22rem] overflow-hidden rounded-[1.75rem] border border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(199,166,110,0.16),transparent_38%),linear-gradient(135deg,rgba(16,13,10,0.82),rgba(10,10,10,0.94))]" />
+                      <motion.div
+                        aria-hidden
+                        className="absolute left-[10%] top-[20%] h-20 w-20 rounded-full border border-white/10 bg-white/6 backdrop-blur-xl"
+                        animate={{ x: [0, 18, 0], y: [0, 12, 0], scale: [1, 1.04, 1] }}
+                        transition={{ duration: 4.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                      >
+                        <div className="flex h-full w-full items-center justify-center text-[color:var(--accent)]">
+                          <BadgeCheck className="h-6 w-6" />
+                        </div>
+                      </motion.div>
+                      <motion.div
+                        aria-hidden
+                        className="absolute right-[12%] top-[18%] h-24 w-24 rounded-full border border-white/10 bg-white/6 backdrop-blur-xl"
+                        animate={{ x: [0, -16, 0], y: [0, 10, 0], scale: [1, 1.03, 1] }}
+                        transition={{ duration: 5, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                      >
+                        <div className="flex h-full w-full items-center justify-center text-[color:var(--accent)]">
+                          <LayoutGrid className="h-6 w-6" />
+                        </div>
+                      </motion.div>
+                      <motion.div
+                        aria-hidden
+                        className="absolute left-[40%] top-[42%] h-28 w-28 rounded-full border border-white/10 bg-[color:var(--accent)]/10 backdrop-blur-xl"
+                        animate={{ scale: [1, 1.08, 1], rotate: [0, 8, 0] }}
+                        transition={{ duration: 3.8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                      >
+                        <div className="flex h-full w-full items-center justify-center text-[color:var(--accent)]">
+                          <ScanSearch className="h-7 w-7" />
+                        </div>
+                      </motion.div>
+                      <motion.div
+                        aria-hidden
+                        className="absolute left-[20%] bottom-[18%] h-16 w-16 rounded-full border border-white/10 bg-white/6 backdrop-blur-xl"
+                        animate={{ x: [0, 22, 0], y: [0, -10, 0], scale: [1, 1.06, 1] }}
+                        transition={{ duration: 4.6, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                      >
+                        <div className="flex h-full w-full items-center justify-center text-[color:var(--accent)]">
+                          <ArrowRight className="h-5 w-5" />
+                        </div>
+                      </motion.div>
+                      <motion.div
+                        aria-hidden
+                        className="absolute right-[18%] bottom-[16%] h-20 w-20 rounded-full border border-white/10 bg-white/6 backdrop-blur-xl"
+                        animate={{ x: [0, -18, 0], y: [0, -12, 0], scale: [1, 1.05, 1] }}
+                        transition={{ duration: 4.4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                      >
+                        <div className="flex h-full w-full items-center justify-center text-[color:var(--accent)]">
+                          <Hammer className="h-5 w-5" />
+                        </div>
+                      </motion.div>
+
+                      <motion.div
+                        aria-hidden
+                        className="absolute inset-x-6 top-1/2 h-px -translate-y-1/2 bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.12),rgba(199,166,110,0.8),rgba(255,255,255,0.9),rgba(199,166,110,0.8),rgba(199,166,110,0.12),transparent)]"
+                        animate={{ opacity: [0.55, 1, 0.55] }}
+                        transition={{ duration: 2.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                      />
+
+                      <motion.div
+                        aria-hidden
+                        className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[color:var(--accent)] shadow-[0_0_24px_rgba(199,166,110,0.85)]"
+                        animate={{ x: [0, 80, 180, 300, 420, 0] }}
+                        transition={{
+                          duration: prefersReducedMotion ? 0 : 6.2,
+                          repeat: Number.POSITIVE_INFINITY,
+                          ease: "easeInOut",
+                        }}
+                        style={{ left: "10%" }}
+                      />
+
+                      <div className="absolute inset-x-5 bottom-5 flex items-center justify-between gap-4 rounded-[1.35rem] border border-white/10 bg-black/35 px-4 py-3 backdrop-blur-xl">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.3em] text-white/55">Now playing</p>
+                          <p className="mt-1 font-display text-2xl text-white">Handshake to reveal</p>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.28em] text-white/60">
+                          <span>01</span>
+                          <span>02</span>
+                          <span>03</span>
+                          <span>04</span>
+                          <span>05</span>
+                          <span>06</span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="mt-6 rounded-[1.5rem] border border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-4">
-                      <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[color:var(--muted)]">
-                        <span>Sequence progress</span>
-                        <span>{Math.round(loaderProgress)}%</span>
-                      </div>
-                      <div className="relative mt-4 h-20 overflow-hidden rounded-full border border-white/8 bg-black/20">
-                        <div className="absolute inset-x-5 top-1/2 h-px -translate-y-1/2 bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.25),rgba(199,166,110,0.8),rgba(199,166,110,0.25),transparent)]" />
-                        {introScenes.map((scene, index) => {
-                          const position = `${8 + index * 18}%`;
-                          const SceneIcon = scene.icon;
-                          const isActive = index === introPhase;
-                          return (
-                            <motion.div
-                              key={scene.title}
-                              className={`absolute top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border text-white shadow-[0_16px_30px_-20px_rgba(0,0,0,0.75)] ${
-                                isActive
-                                  ? "border-[color:var(--accent)]/70 bg-[color:var(--accent)]/22"
-                                  : "border-white/10 bg-black/30"
-                              }`}
-                              style={{ left: position }}
-                              animate={{ y: [0, -5, 0], scale: isActive ? [1, 1.12, 1] : [1, 1, 1] }}
-                              transition={{
-                                duration: 2.8,
-                                repeat: Number.POSITIVE_INFINITY,
-                                ease: "easeInOut",
-                                delay: index * 0.16,
-                              }}
-                            >
-                              <SceneIcon className="h-4 w-4" />
-                            </motion.div>
-                          );
-                        })}
-
-                        <motion.div
-                          className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[color:var(--accent)] shadow-[0_0_24px_rgba(199,166,110,0.85)]"
-                          animate={{ x: [0, 140, 280, 420, 560, 0] }}
-                          transition={{
-                            duration: prefersReducedMotion ? 0 : 6.5,
-                            repeat: Number.POSITIVE_INFINITY,
-                            ease: "easeInOut",
-                          }}
-                          style={{ left: "8%" }}
-                        />
-                      </div>
+                    <div className="mt-4 flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[color:var(--muted)]">
+                      <span>Building the story</span>
+                      <span>{Math.round(loaderProgress)}%</span>
+                    </div>
+                    <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/8">
+                      <motion.div
+                        className="h-full rounded-full bg-[linear-gradient(90deg,#8f6c39,#d5b77a,#fff4d8,#d5b77a,#8f6c39)]"
+                        animate={{ width: `${loaderProgress}%` }}
+                        transition={{ duration: 0.55, ease: "easeOut" }}
+                      />
                     </div>
                   </div>
                 </div>
@@ -845,7 +820,7 @@ export function LuxurySite() {
         </AnimatePresence>
       </header>
 
-      <main className="relative">
+      <main className={`relative transition-opacity duration-300 ${loaderVisible ? "opacity-0 pointer-events-none select-none" : "opacity-100"}`}>
         <section id="home" className="relative min-h-screen overflow-hidden pt-28 sm:pt-32">
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(199,166,110,0.24),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.12),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent_40%)]" />
           <div className="absolute inset-x-0 top-0 -z-10 h-[78vh] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_40%),linear-gradient(135deg,rgba(16,13,10,0.96),rgba(24,20,16,0.94)_42%,rgba(10,10,10,0.96))] dark:block" />
