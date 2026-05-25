@@ -579,7 +579,7 @@ const processClockData = [
   { zone: "Delivery", steps: ["Styling", "Quality Check", "Final Handover"] },
 ];
 
-function ProcessClock({ onOpen, onActive }: { onOpen: (i: number) => void; onActive?: (i: number) => void }) {
+function ProcessClock({ onOpen, onActive, activeMicro, onMicroHover }: { onOpen: (i: number) => void; onActive?: (i: number) => void; activeMicro?: number | null; onMicroHover?: (i: number | null) => void }) {
   const prefersReducedMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const handRef = useRef<HTMLDivElement | null>(null);
@@ -650,7 +650,34 @@ function ProcessClock({ onOpen, onActive }: { onOpen: (i: number) => void; onAct
               const r = 140;
               const x = Math.cos(a) * r;
               const y = Math.sin(a) * r;
-              return <div key={m} className="process-mini absolute bg-white/10 rounded-full" style={{ left: `calc(50% + ${x}px)`, top: `calc(50% + ${y}px)`, width: 8, height: 8 }} />;
+              const left = `calc(50% + ${x}px)`;
+              const top = `calc(50% + ${y}px)`;
+              const isActive = activeMicro === i;
+              return (
+                <div key={`${m}-${i}`} style={{ left, top }} className="absolute flex items-center justify-center">
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onMouseEnter={() => onMicroHover?.(i)}
+                    onFocus={() => onMicroHover?.(i)}
+                    onMouseLeave={() => onMicroHover?.(null)}
+                    onBlur={() => onMicroHover?.(null)}
+                    onClick={() => onOpen(i)}
+                    className={"process-mini rounded-full cursor-pointer " + (isActive ? 'scale-125 bg-[rgba(199,166,110,0.95)]' : 'bg-white/10')}
+                    style={{ width: isActive ? 12 : 8, height: isActive ? 12 : 8 }}
+                  />
+                  {isActive ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="absolute z-30 max-w-xs rounded-md bg-[rgba(6,6,6,0.9)] px-2 py-1 text-xs text-[color:var(--muted)]"
+                      style={{ left: 18, top: -8 }}
+                    >
+                      {m}
+                    </motion.div>
+                  ) : null}
+                </div>
+              );
             })}
           </div>
 
@@ -755,6 +782,7 @@ export function LuxurySite() {
   const [split, setSplit] = useState(56);
   const [processModalIndex, setProcessModalIndex] = useState<number | null>(null);
   const [processActiveIndex, setProcessActiveIndex] = useState<number>(0);
+  const [processActiveMicro, setProcessActiveMicro] = useState<number | null>(null);
 
   const getNearestMain = (idx: number) => {
     const mainIndices = [0,1,4,5];
@@ -1377,11 +1405,11 @@ export function LuxurySite() {
                     <button
                       key={label}
                       onMouseEnter={() => {
-                        // compute zone index
                         const zoneIdx = Math.floor(i / 3);
-                        // communicate to clock
-                        // set active micro index via onActive callback
+                        setProcessActiveIndex(zoneIdx);
+                        setProcessActiveMicro(i);
                       }}
+                      onMouseLeave={() => setProcessActiveMicro(null)}
                       onClick={() => setProcessModalIndex(i)}
                       className="group flex w-full items-start gap-4 rounded-xl border border-[color:var(--border)] bg-white/3 p-4 transition-shadow hover:shadow-[0_30px_80px_-40px_rgba(0,0,0,0.6)]"
                     >
@@ -1403,7 +1431,12 @@ export function LuxurySite() {
 
               <div className="flex justify-center lg:justify-end">
                 <div className="w-full max-w-[640px]">
-                  <ProcessClock onOpen={(i) => setProcessModalIndex(i)} onActive={(i) => { /* optional - could sync left list */ }} />
+                  <ProcessClock
+                    onOpen={(i) => setProcessModalIndex(i)}
+                    onActive={(i) => { /* optional - could sync left list */ }}
+                    activeMicro={processActiveMicro}
+                    onMicroHover={(idx) => setProcessActiveMicro(idx)}
+                  />
                 </div>
               </div>
             </div>
