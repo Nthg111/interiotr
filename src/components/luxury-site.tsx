@@ -29,6 +29,8 @@ import {
   SunMedium,
   Hammer,
   Building2,
+  Boxes,
+  Ruler,
   Send,
 } from "lucide-react";
 import { useTheme } from "next-themes";
