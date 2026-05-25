@@ -453,6 +453,8 @@ export function LuxurySite() {
 
     const getTravel = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
 
+    const pairs = Math.ceil(processSteps.length / 2);
+
     const st = ScrollTrigger.create({
       trigger: section,
       start: "top top",
@@ -468,13 +470,11 @@ export function LuxurySite() {
           setProcessScrollProgress(nextProgress);
         }
 
-        const nextActive = Math.min(
-          processSteps.length - 1,
-          Math.round(nextProgress * (processSteps.length - 1)),
-        );
-        if (nextActive !== processActiveRef.current) {
-          processActiveRef.current = nextActive;
-          setActiveProcessStep(nextActive);
+        // calculate active pair index (two cards at a time)
+        const nextPair = Math.min(pairs - 1, Math.round(nextProgress * (pairs - 1)));
+        if (nextPair !== processActiveRef.current) {
+          processActiveRef.current = nextPair;
+          setActiveProcessStep(nextPair);
         }
       },
     });
@@ -1049,16 +1049,21 @@ export function LuxurySite() {
                 className="flex h-full items-center gap-8 py-8"
               >
                 {processSteps.map((step, index) => {
-                  const isActive = index === activeProcessStep;
+                  const activePairIndex = activeProcessStep;
+                  const isActivePair = Math.floor(index / 2) === activePairIndex;
+                  // determine direction relative to current active pair for subtle offset
+                  const pairIndex = Math.floor(index / 2);
+                  const direction = pairIndex < activePairIndex ? -1 : pairIndex > activePairIndex ? 1 : 0;
                   return (
                     <motion.div
                       key={step.title}
                       className={`relative min-w-[20rem] max-w-md flex-shrink-0 transform-gpu rounded-[1.5rem] border border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(10,10,10,0.4))] p-6 shadow-[0_24px_64px_-32px_rgba(0,0,0,0.8)]`}
                       initial={{ opacity: 0.9 }}
                       animate={{
-                        scale: isActive ? 1.04 : 1,
-                        opacity: isActive ? 1 : 0.72,
-                        filter: isActive ? "none" : "grayscale(0.18) brightness(0.88)",
+                        scale: isActivePair ? 1.06 : 0.96,
+                        opacity: isActivePair ? 1 : 0.6,
+                        x: isActivePair ? 0 : direction * 36,
+                        filter: isActivePair ? "none" : "grayscale(0.18) brightness(0.82)",
                       }}
                       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                       whileHover={{ y: -6 }}
