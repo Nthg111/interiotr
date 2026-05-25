@@ -385,8 +385,8 @@ export function LuxurySite() {
 
   useEffect(() => {
     const mountFrame = requestAnimationFrame(() => setMounted(true));
-    // Toggle this to re-enable smooth scrolling during debugging.
-    const enableLenis = false;
+      // Toggle this to re-enable smooth scrolling during debugging.
+      const enableLenis = true;
 
     if (!enableLenis) {
       return () => {
@@ -522,7 +522,9 @@ export function LuxurySite() {
   const themeIsDark = resolvedTheme ? resolvedTheme === "dark" : true;
 
   // debugDisableOverlays: when true, make fixed overlays non-interactive to test scroll blocking.
-  const debugDisableOverlays = true;
+  const debugDisableOverlays = false;
+  // debugVisual: show a small on-screen debug indicator for process scroll progress.
+  const debugVisual = true;
 
   return (
     <div className="relative isolate overflow-hidden bg-[color:var(--background)]">
@@ -537,6 +539,12 @@ export function LuxurySite() {
         }`}
         style={{ scaleX: progress }}
       />
+
+      {debugVisual ? (
+        <div className="fixed right-4 bottom-4 z-[80] rounded-md bg-black/60 px-3 py-2 text-xs text-white backdrop-blur-sm">
+          <div>Process progress: {(processScrollProgress * 100).toFixed(1)}%</div>
+        </div>
+      ) : null}
 
 
       <header
