@@ -74,3 +74,99 @@ section {
 .font-display {
   font-family: var(--font-cormorant), serif;
 }
+
+/* Process 3D circular rotator styles (polished) */
+:root {
+  --process-rotate-duration: 18s;
+  --process-translate-radius: 8rem;
+}
+.process-3d {
+  width: 20rem;
+  height: 20rem;
+  perspective: 1200px;
+  -webkit-perspective: 1200px;
+}
+.process-rotator {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: process-rotate var(--process-rotate-duration) linear infinite;
+  transition: transform 300ms ease;
+  backface-visibility: hidden;
+}
+.process-rotator:hover,
+.process-rotator:focus-within {
+  animation-play-state: paused;
+}
+.process-segment {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center calc(-1 * var(--process-translate-radius));
+  width: 12rem;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: rgb(var(--foreground));
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.65), inset 0 -6px 18px rgba(0,0,0,0.25);
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+  -webkit-backface-visibility: hidden;
+  cursor: default;
+}
+.process-segment:focus,
+.process-segment:hover {
+  transform: translateZ(18px) scale(1.03);
+  box-shadow: 0 28px 48px rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.02) inset;
+}
+.process-segment:focus {
+  outline: 2px solid rgba(199,166,110,0.3);
+  outline-offset: 6px;
+}
+.process-segment .label {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+@keyframes process-rotate {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
+}
+
+/* Position the 6 segments around the circle with refined depth */
+.process-segment.segment-0 { transform: rotateZ(0deg) translateY(calc(-1 * var(--process-translate-radius))) rotateX(18deg); }
+.process-segment.segment-1 { transform: rotateZ(60deg) translateY(calc(-1 * var(--process-translate-radius))) rotateX(18deg); }
+.process-segment.segment-2 { transform: rotateZ(120deg) translateY(calc(-1 * var(--process-translate-radius))) rotateX(18deg); }
+.process-segment.segment-3 { transform: rotateZ(180deg) translateY(calc(-1 * var(--process-translate-radius))) rotateX(18deg); }
+.process-segment.segment-4 { transform: rotateZ(240deg) translateY(calc(-1 * var(--process-translate-radius))) rotateX(18deg); }
+.process-segment.segment-5 { transform: rotateZ(300deg) translateY(calc(-1 * var(--process-translate-radius))) rotateX(18deg); }
+
+/* accent tint per segment for subtle visual separation */
+.process-segment.segment-0 { background-image: linear-gradient(180deg, rgba(199,166,110,0.14), rgba(255,255,255,0.02)); }
+.process-segment.segment-1 { background-image: linear-gradient(180deg, rgba(164,123,58,0.10), rgba(255,255,255,0.02)); }
+.process-segment.segment-2 { background-image: linear-gradient(180deg, rgba(120,100,80,0.06), rgba(255,255,255,0.02)); }
+.process-segment.segment-3 { background-image: linear-gradient(180deg, rgba(199,166,110,0.14), rgba(255,255,255,0.02)); }
+.process-segment.segment-4 { background-image: linear-gradient(180deg, rgba(164,123,58,0.10), rgba(255,255,255,0.02)); }
+.process-segment.segment-5 { background-image: linear-gradient(180deg, rgba(120,100,80,0.06), rgba(255,255,255,0.02)); }
+
+/* Pause on reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .process-rotator {
+    animation: none;
+    transform: rotateY(0deg);
+  }
+}
+
+/* Mobile: hide 3D and show stacked list */
+@media (max-width: 1023px) {
+  .process-3d { display: none; }
+  .process-list { display: block; }
+}
+@media (min-width: 1024px) {
+  .process-list { display: none; }
+}

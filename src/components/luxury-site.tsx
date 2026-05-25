@@ -236,6 +236,15 @@ const stats = [
   { value: "360°", label: "Design to Handover" },
 ];
 
+const circularProcessSteps: ProcessStep[] = [
+  { title: "Consultation", description: "Initial client meetings and brief definition.", material: "Brief", detail: "Client goals, scope, and budget.", texture: "" },
+  { title: "Design", description: "Concepts, moodboards and layout development.", material: "Concept", detail: "Schematics, finishes, and approvals.", texture: "" },
+  { title: "Selection", description: "Material selection and procurement planning.", material: "Materials", detail: "Samples, sourcing, and lead times.", texture: "" },
+  { title: "Documentation", description: "Construction drawings and shop drawings.", material: "Docs", detail: "Coordination packages for trades.", texture: "" },
+  { title: "Execution", description: "Site management, fabrication, and installation.", material: "Site", detail: "On-site supervision and QA.", texture: "" },
+  { title: "Handover", description: "Quality check and final client handover.", material: "Handover", detail: "Punchlist, training, and warranties.", texture: "" },
+];
+
 const galleryFilters = ["All", "Residential", "Commercial", "Materials"] as const;
 
 function scrollToSection(id: string) {
@@ -321,6 +330,7 @@ export function LuxurySite() {
   const [selectedGalleryFilter, setSelectedGalleryFilter] = useState<(typeof galleryFilters)[number]>("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [split, setSplit] = useState(56);
+  const [processModalIndex, setProcessModalIndex] = useState<number | null>(null);
   const { setTheme, resolvedTheme } = useTheme();
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
@@ -911,7 +921,59 @@ export function LuxurySite() {
           </div>
         </section>
 
-        {/* Process section removed by request */}
+        <section id="process" className="py-10 sm:py-20">
+          <SectionShell
+            eyebrow="Process"
+            title="A concise, circular view of our six-step process."
+            description="A rotating 3D cycle summarizes the journey from first meeting to handover."
+          />
+
+          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
+            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div>
+                <p className="text-sm text-[color:var(--muted)]">
+                  We keep the process clear and calm: from initial briefing to final handover.
+                  Below is a compact visual summary — tap any step on mobile to read more.
+                </p>
+                <div className="mt-6 process-list grid gap-3">
+                  {circularProcessSteps.map((s, i) => (
+                    <div key={s.title} className="rounded-xl border border-[color:var(--border)] bg-white/3 p-3">
+                      <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted)]">{String(i + 1).padStart(2, '0')}</p>
+                      <h4 className="mt-1 font-display text-lg text-[color:var(--foreground)]">{s.title}</h4>
+                      <p className="mt-1 text-sm text-[color:var(--muted)]">{s.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center">
+                <div className="process-3d" aria-hidden>
+                  <div className="process-rotator">
+                    {circularProcessSteps.map((s, i) => (
+                      <div
+                        key={s.title}
+                        className={`process-segment segment-${i}`}
+                        title={s.title}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`${s.title}: ${s.description}`}
+                        onClick={() => setProcessModalIndex(i)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") setProcessModalIndex(i);
+                        }}
+                      >
+                        <div className="label text-sm text-[color:var(--foreground)] text-center px-2">
+                          <div className="text-xs opacity-70">{String(i + 1).padStart(2, '0')}</div>
+                          <div className="font-display mt-1">{s.title}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <section id="testimonials" className="py-10 sm:py-20">
           <SectionShell
@@ -1175,6 +1237,46 @@ export function LuxurySite() {
           </div>
         </section>
       </main>
+
+      <AnimatePresence>
+        {processModalIndex !== null ? (
+          <motion.div
+            key="process-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 py-8"
+            onClick={() => setProcessModalIndex(null)}
+          >
+            <motion.div
+              initial={{ y: 24, scale: 0.98 }}
+              animate={{ y: 0, scale: 1 }}
+              exit={{ y: 24, scale: 0.98 }}
+              transition={{ duration: 0.28 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-2xl rounded-2xl border border-[color:var(--border)] bg-[color:var(--background)] p-6 shadow-[0_40px_120px_-60px_rgba(0,0,0,0.9)]"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.32em] text-[color:var(--muted)]">{String(processModalIndex + 1).padStart(2, '0')}</p>
+                  <h3 className="mt-2 font-display text-2xl text-[color:var(--foreground)]">{circularProcessSteps[processModalIndex].title}</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setProcessModalIndex(null)}
+                  className="rounded-full border border-[color:var(--border)] p-2 text-sm"
+                  aria-label="Close"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <p className="mt-4 text-sm text-[color:var(--muted)]">{circularProcessSteps[processModalIndex].description}</p>
+              <div className="mt-4 text-sm text-[color:var(--muted)]">{circularProcessSteps[processModalIndex].detail}</div>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       <footer className="border-t border-[color:var(--border)] bg-[color:var(--background)]/75 px-6 py-10 backdrop-blur-xl sm:px-8 lg:px-10">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
