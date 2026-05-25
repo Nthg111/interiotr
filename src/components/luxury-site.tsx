@@ -167,50 +167,7 @@ const projects: Project[] = [
   },
 ];
 
-const processSteps: ProcessStep[] = [
-  {
-    title: "Consultation",
-    description: "We define intent, budget, use-case, and the level of finish expected.",
-    material: "Program Brief",
-    detail: "Lifestyle mapping, budget architecture, and narrative goals.",
-    texture: "from-stone-900/70 via-zinc-900/55 to-amber-900/45",
-  },
-  {
-    title: "Design",
-    description: "Moodboards, layouts, and material studies evolve into a cohesive direction.",
-    material: "Spatial Composition",
-    detail: "Concept boards, zoning logic, and curated visual rhythm.",
-    texture: "from-neutral-900/70 via-zinc-900/60 to-stone-800/45",
-  },
-  {
-    title: "Material Selection",
-    description: "Stone, timber, fabrics, and finishes are curated with a premium eye.",
-    material: "Material Library",
-    detail: "Tactile swatches tuned for longevity, tone, and maintenance.",
-    texture: "from-amber-900/60 via-stone-900/60 to-zinc-900/55",
-  },
-  {
-    title: "Execution",
-    description: "Site coordination, fabrication, and installation are handled with precision.",
-    material: "Site Orchestration",
-    detail: "Trades, production, and sequencing controlled in one flow.",
-    texture: "from-zinc-900/75 via-stone-900/55 to-neutral-900/65",
-  },
-  {
-    title: "Quality Check",
-    description: "Every junction, finish, and line is inspected before delivery is accepted.",
-    material: "Detail Audit",
-    detail: "Surface alignment, tolerance checks, and finish consistency.",
-    texture: "from-stone-900/65 via-neutral-900/65 to-zinc-800/45",
-  },
-  {
-    title: "Delivery",
-    description: "A finished interior is handed over ready for immediate use and longevity.",
-    material: "Final Reveal",
-    detail: "Walkthrough, handover documentation, and aftercare briefing.",
-    texture: "from-amber-900/55 via-stone-900/55 to-neutral-900/75",
-  },
-];
+// Process section removed — timeline and animation handled elsewhere.
 
 const testimonials = [
   {
@@ -360,13 +317,7 @@ export function LuxurySite() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const lenisRef = useRef<InstanceType<typeof Lenis> | null>(null);
-  const [activeProcessStep, setActiveProcessStep] = useState(0);
-  const [processScrollProgress, setProcessScrollProgress] = useState(0);
-  const processSectionRef = useRef<HTMLElement | null>(null);
-  const processViewportRef = useRef<HTMLDivElement | null>(null);
-  const processTrackRef = useRef<HTMLDivElement | null>(null);
-  const processActiveRef = useRef(0);
-  const processProgressRef = useRef(0);
+  // Process section removed — related state and refs omitted.
   const [selectedGalleryFilter, setSelectedGalleryFilter] = useState<(typeof galleryFilters)[number]>("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [split, setSplit] = useState(56);
@@ -429,167 +380,7 @@ export function LuxurySite() {
     return () => window.clearInterval(ticker);
   }, []);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    gsap.registerPlugin(ScrollTrigger);
-
-    const section = processSectionRef.current;
-    const viewport = processViewportRef.current;
-    const track = processTrackRef.current;
-
-    if (!section || !viewport || !track) return;
-
-    // Wire ScrollTrigger to Lenis when available so GSAP and smooth-scroll stay in sync
-    const lenis = lenisRef.current;
-    let lenisHandler: (() => void) | null = null;
-    if (lenis) {
-      try {
-        ScrollTrigger.scrollerProxy(document.documentElement, {
-          scrollTop(value?: number) {
-            if (arguments.length && typeof value === "number") {
-              if (typeof lenis.scrollTo === "function") lenis.scrollTo(value, { duration: 0 });
-              else if (typeof lenis.scroll === "object" && (lenis.scroll as any).set) (lenis.scroll as any).set(value);
-              return;
-            }
-            return (
-              (lenis.scroll as any)?.instance?.scroll?.y ?? (lenis.scroll as any)?.y ?? window.scrollY
-            );
-          },
-          getBoundingClientRect() {
-            return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
-          },
-          pinType: document.documentElement.style.transform ? "transform" : "fixed",
-        });
-
-        if (typeof lenis.on === "function") {
-          lenisHandler = () => ScrollTrigger.update();
-          lenis.on("scroll", lenisHandler);
-        }
-      } catch {
-        // if scroller proxy fails, fall back to default ScrollTrigger behavior
-      }
-    }
-
-    const getScrollAmount = () => Math.max(0, track.scrollWidth - viewport.offsetWidth);
-    const pairs = Math.ceil(processSteps.length / 2);
-
-    // Use matchMedia to provide a mobile-friendly fallback and desktop pin behavior
-    const mm = ScrollTrigger.matchMedia({
-      // Desktop: pin the section and translate the horizontal track
-      "(min-width: 1024px)": () => {
-        let tween: gsap.core.Tween | null = null;
-
-        const st = ScrollTrigger.create({
-          trigger: section,
-          start: "top top",
-          end: () => `+=${getScrollAmount()}`,
-          pin: true,
-          pinSpacing: true,
-          scrub: 1,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate(self) {
-            const nextProgress = self.progress;
-            if (Math.abs(nextProgress - processProgressRef.current) > 0.002) {
-              processProgressRef.current = nextProgress;
-              setProcessScrollProgress(nextProgress);
-            }
-
-            const nextPair = Math.min(pairs - 1, Math.round(nextProgress * (pairs - 1)));
-            if (nextPair !== processActiveRef.current) {
-              processActiveRef.current = nextPair;
-              setActiveProcessStep(nextPair);
-            }
-          },
-        });
-
-        tween = gsap.to(track, {
-          x: () => -getScrollAmount(),
-          ease: "none",
-          scrollTrigger: st,
-        });
-
-        const parallax = gsap.to(section.querySelectorAll("[data-process-parallax]"), {
-          yPercent: -10,
-          ease: "none",
-          scrollTrigger: {
-            trigger: section,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-          },
-        });
-
-        // Ensure tween recalculates when ScrollTrigger refreshes (resize, images load)
-        ScrollTrigger.addEventListener("refresh", () => tween?.invalidate());
-
-        return () => {
-          tween?.kill();
-          parallax.kill();
-          st.kill();
-        };
-      },
-
-      // Mobile & small screens: don't pin, just allow the track to scroll vertically (stacked feel)
-      "(max-width: 1023px)": () => {
-        let tween: gsap.core.Tween | null = null;
-
-        const st = ScrollTrigger.create({
-          trigger: section,
-          start: "top top",
-          end: () => `+=${getScrollAmount()}`,
-          pin: false,
-          scrub: 1,
-          invalidateOnRefresh: true,
-          onUpdate(self) {
-            const nextProgress = self.progress;
-            if (Math.abs(nextProgress - processProgressRef.current) > 0.002) {
-              processProgressRef.current = nextProgress;
-              setProcessScrollProgress(nextProgress);
-            }
-
-            const nextPair = Math.min(pairs - 1, Math.round(nextProgress * (pairs - 1)));
-            if (nextPair !== processActiveRef.current) {
-              processActiveRef.current = nextPair;
-              setActiveProcessStep(nextPair);
-            }
-          },
-        });
-
-        tween = gsap.to(track, {
-          x: () => -getScrollAmount(),
-          ease: "none",
-          scrollTrigger: st,
-        });
-
-        ScrollTrigger.addEventListener("refresh", () => tween?.invalidate());
-
-        return () => {
-          tween?.kill();
-          st.kill();
-        };
-      },
-    });
-
-    // After layout stabilizes (images/fonts), force a refresh so ScrollTrigger measures correctly
-    const rafId = requestAnimationFrame(() => ScrollTrigger.refresh());
-
-    // Also refresh on a debounced resize
-    let resizeTimer: number | null = null;
-    const onResize = () => {
-      if (resizeTimer) window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(() => ScrollTrigger.refresh(), 120);
-    };
-    window.addEventListener("resize", onResize);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener("resize", onResize);
-      // kill any ScrollTriggers created by this component
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-      if (lenis && lenisHandler && typeof lenis.off === "function") lenis.off("scroll", lenisHandler);
-    };
-  }, []);
+  // Process section removed — ScrollTrigger/GSAP logic omitted.
 
   const themeIsDark = resolvedTheme ? resolvedTheme === "dark" : true;
 
@@ -612,11 +403,7 @@ export function LuxurySite() {
         style={{ scaleX: progress }}
       />
 
-      {debugVisual ? (
-        <div className="fixed right-4 bottom-4 z-[80] rounded-md bg-black/60 px-3 py-2 text-xs text-white backdrop-blur-sm">
-          <div>Process progress: {(processScrollProgress * 100).toFixed(1)}%</div>
-        </div>
-      ) : null}
+      {/* debugVisual removed */}
 
 
       <header
@@ -1124,83 +911,7 @@ export function LuxurySite() {
           </div>
         </section>
 
-        <section ref={processSectionRef as React.RefObject<HTMLElement>} className="relative min-h-screen overflow-hidden">
-          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-            <SectionShell
-              eyebrow="Process"
-              title="A six-step timeline designed for calm, premium delivery."
-              description="Scroll through a cinematic, horizontal journey — one active step at a time."
-            />
-          </div>
-
-          <div className="relative mt-6 h-[calc(100vh-6.5rem)] w-full">
-            <div className="absolute left-0 right-0 top-6 z-20 px-6">
-              <div className="mx-auto max-w-7xl">
-                <div className="relative h-1 rounded-full bg-[color:var(--border)]/30">
-                  <div
-                    aria-hidden
-                    className="absolute left-0 top-0 h-full rounded-full bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.95),rgba(255,255,255,0.9))]"
-                    style={{ width: `${Math.round(processScrollProgress * 100)}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div
-              ref={processViewportRef as React.RefObject<HTMLDivElement>}
-              className="relative z-10 mx-auto mt-12 h-full max-w-full overflow-hidden px-6"
-            >
-              <div
-                ref={processTrackRef as React.RefObject<HTMLDivElement>}
-                className="flex min-w-max items-center gap-8 py-8 will-change-transform"
-              >
-                {processSteps.map((step, index) => {
-                  const activePairIndex = activeProcessStep;
-                  const isActivePair = Math.floor(index / 2) === activePairIndex;
-                  // determine direction relative to current active pair for subtle offset
-                  const pairIndex = Math.floor(index / 2);
-                  const direction = pairIndex < activePairIndex ? -1 : pairIndex > activePairIndex ? 1 : 0;
-                  return (
-                    <motion.div
-                      key={step.title}
-                      className={`relative min-w-[20rem] max-w-md flex-shrink-0 transform-gpu rounded-[1.5rem] border border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(10,10,10,0.4))] p-6 shadow-[0_24px_64px_-32px_rgba(0,0,0,0.8)]`}
-                      initial={{ opacity: 0.9 }}
-                      animate={{
-                        scale: isActivePair ? 1.06 : 0.96,
-                        opacity: isActivePair ? 1 : 0.6,
-                        x: isActivePair ? 0 : direction * 36,
-                        filter: isActivePair ? "none" : "grayscale(0.18) brightness(0.82)",
-                      }}
-                      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                      whileHover={{ y: -6 }}
-                    >
-                      <div className="pointer-events-none absolute inset-0 rounded-[1.25rem] bg-[radial-gradient(closest-side,rgba(199,166,110,0.06),transparent_40%)] opacity-40" data-process-parallax />
-
-                      <div className="relative z-10">
-                        <div className="flex items-center gap-4">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--background)] text-sm font-semibold text-[color:var(--accent)]">
-                            {String(index + 1).padStart(2, "0")}
-                          </div>
-                          <div>
-                            <p className="text-xs uppercase tracking-[0.32em] text-[color:var(--muted)]">Step</p>
-                            <h3 className="mt-2 font-display text-2xl text-[color:var(--foreground)]">{step.title}</h3>
-                          </div>
-                        </div>
-
-                        <p className="mt-4 text-sm leading-7 text-[color:var(--muted)]">{step.description}</p>
-
-                        <div className="mt-4 flex items-center gap-3">
-                          <span className="rounded-full border border-[color:var(--border)] bg-white/3 px-3 py-1 text-xs text-[color:var(--muted)]">{step.material}</span>
-                          <span className="text-sm text-[color:var(--muted)]">{step.detail}</span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Process section removed by request */}
 
         <section id="testimonials" className="py-10 sm:py-20">
           <SectionShell
