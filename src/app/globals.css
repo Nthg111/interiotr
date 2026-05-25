@@ -48,11 +48,22 @@ html {
     linear-gradient(180deg, rgb(var(--background)), rgb(var(--background)));
 }
 
+html,
 body {
+  overflow-x: hidden;
+}
+
+body {
+  position: relative;
   min-height: 100vh;
+  overflow-x: hidden;
   background: rgb(var(--background));
   color: rgb(var(--foreground));
   font-family: var(--font-manrope), sans-serif;
+}
+
+section {
+  position: relative;
 }
 
 ::selection {

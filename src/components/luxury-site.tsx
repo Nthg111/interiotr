@@ -470,7 +470,7 @@ export function LuxurySite() {
       }
     }
 
-    const getTravel = () => Math.max(0, track.scrollWidth - viewport.offsetWidth);
+    const getScrollAmount = () => Math.max(0, track.scrollWidth - viewport.offsetWidth);
     const pairs = Math.ceil(processSteps.length / 2);
 
     // Use matchMedia to provide a mobile-friendly fallback and desktop pin behavior
@@ -482,7 +482,7 @@ export function LuxurySite() {
         const st = ScrollTrigger.create({
           trigger: section,
           start: "top top",
-          end: () => `+=${getTravel()}`,
+          end: () => `+=${getScrollAmount()}`,
           pin: true,
           pinSpacing: true,
           scrub: 1,
@@ -504,7 +504,7 @@ export function LuxurySite() {
         });
 
         tween = gsap.to(track, {
-          x: () => -getTravel(),
+          x: () => -getScrollAmount(),
           ease: "none",
           scrollTrigger: st,
         });
@@ -537,7 +537,7 @@ export function LuxurySite() {
         const st = ScrollTrigger.create({
           trigger: section,
           start: "top top",
-          end: () => `+=${getTravel()}`,
+          end: () => `+=${getScrollAmount()}`,
           pin: false,
           scrub: 1,
           invalidateOnRefresh: true,
@@ -557,7 +557,7 @@ export function LuxurySite() {
         });
 
         tween = gsap.to(track, {
-          x: () => -getTravel(),
+          x: () => -getScrollAmount(),
           ease: "none",
           scrollTrigger: st,
         });
@@ -1124,7 +1124,7 @@ export function LuxurySite() {
           </div>
         </section>
 
-        <section ref={processSectionRef as React.RefObject<HTMLElement>} className="relative h-screen">
+        <section ref={processSectionRef as React.RefObject<HTMLElement>} className="relative min-h-screen overflow-hidden">
           <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
             <SectionShell
               eyebrow="Process"
@@ -1152,7 +1152,7 @@ export function LuxurySite() {
             >
               <div
                 ref={processTrackRef as React.RefObject<HTMLDivElement>}
-                className="flex h-full items-center gap-8 py-8"
+                className="flex min-w-max items-center gap-8 py-8 will-change-transform"
               >
                 {processSteps.map((step, index) => {
                   const activePairIndex = activeProcessStep;
