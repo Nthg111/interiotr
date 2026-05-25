@@ -439,20 +439,21 @@ export function LuxurySite() {
 
     if (!section || !viewport || !track) return;
 
-    // If Lenis is active, wire ScrollTrigger to it so GSAP stays in sync with smooth scrolling
+    // Wire ScrollTrigger to Lenis when available so GSAP and smooth-scroll stay in sync
     const lenis = lenisRef.current;
+    let lenisHandler: (() => void) | null = null;
     if (lenis) {
       try {
         ScrollTrigger.scrollerProxy(document.documentElement, {
           scrollTop(value?: number) {
             if (arguments.length && typeof value === "number") {
-              // scrollTo with zero duration to immediately set when requested
               if (typeof lenis.scrollTo === "function") lenis.scrollTo(value, { duration: 0 });
               else if (typeof lenis.scroll === "object" && (lenis.scroll as any).set) (lenis.scroll as any).set(value);
               return;
             }
-            // try to return current Lenis scroll position, fallback to window
-            return (lenis && (lenis.scroll as any) && ((lenis.scroll as any).instance?.scroll?.y ?? (lenis.scroll as any).y)) || window.scrollY;
+            return (
+              (lenis.scroll as any)?.instance?.scroll?.y ?? (lenis.scroll as any)?.y ?? window.scrollY
+            );
           },
           getBoundingClientRect() {
             return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
@@ -460,62 +461,133 @@ export function LuxurySite() {
           pinType: document.documentElement.style.transform ? "transform" : "fixed",
         });
 
-        // ensure ScrollTrigger updates when Lenis notifies
-        if (typeof lenis.on === "function") lenis.on("scroll", () => ScrollTrigger.update());
+        if (typeof lenis.on === "function") {
+          lenisHandler = () => ScrollTrigger.update();
+          lenis.on("scroll", lenisHandler);
+        }
       } catch {
-        // ignore scroller proxy errors
+        // if scroller proxy fails, fall back to default ScrollTrigger behavior
       }
     }
 
-    const getTravel = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
-
+    const getTravel = () => Math.max(0, track.scrollWidth - viewport.offsetWidth);
     const pairs = Math.ceil(processSteps.length / 2);
 
-    const st = ScrollTrigger.create({
-      trigger: section,
-      start: "top top",
-      end: () => `+=${Math.max(2200, processSteps.length * 640)}`,
-      pin: true,
-      scrub: 1,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-      onUpdate(self) {
-        const nextProgress = self.progress;
-        if (Math.abs(nextProgress - processProgressRef.current) > 0.002) {
-          processProgressRef.current = nextProgress;
-          setProcessScrollProgress(nextProgress);
-        }
+    // Use matchMedia to provide a mobile-friendly fallback and desktop pin behavior
+    const mm = ScrollTrigger.matchMedia({
+      // Desktop: pin the section and translate the horizontal track
+      "(min-width: 1024px)": () => {
+        let tween: gsap.core.Tween | null = null;
 
-        // calculate active pair index (two cards at a time)
-        const nextPair = Math.min(pairs - 1, Math.round(nextProgress * (pairs - 1)));
-        if (nextPair !== processActiveRef.current) {
-          processActiveRef.current = nextPair;
-          setActiveProcessStep(nextPair);
-        }
+        const st = ScrollTrigger.create({
+          trigger: section,
+          start: "top top",
+          end: () => `+=${getTravel()}`,
+          pin: true,
+          pinSpacing: true,
+          scrub: 1,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate(self) {
+            const nextProgress = self.progress;
+            if (Math.abs(nextProgress - processProgressRef.current) > 0.002) {
+              processProgressRef.current = nextProgress;
+              setProcessScrollProgress(nextProgress);
+            }
+
+            const nextPair = Math.min(pairs - 1, Math.round(nextProgress * (pairs - 1)));
+            if (nextPair !== processActiveRef.current) {
+              processActiveRef.current = nextPair;
+              setActiveProcessStep(nextPair);
+            }
+          },
+        });
+
+        tween = gsap.to(track, {
+          x: () => -getTravel(),
+          ease: "none",
+          scrollTrigger: st,
+        });
+
+        const parallax = gsap.to(section.querySelectorAll("[data-process-parallax]"), {
+          yPercent: -10,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1,
+          },
+        });
+
+        // Ensure tween recalculates when ScrollTrigger refreshes (resize, images load)
+        ScrollTrigger.addEventListener("refresh", () => tween?.invalidate());
+
+        return () => {
+          tween?.kill();
+          parallax.kill();
+          st.kill();
+        };
+      },
+
+      // Mobile & small screens: don't pin, just allow the track to scroll vertically (stacked feel)
+      "(max-width: 1023px)": () => {
+        let tween: gsap.core.Tween | null = null;
+
+        const st = ScrollTrigger.create({
+          trigger: section,
+          start: "top top",
+          end: () => `+=${getTravel()}`,
+          pin: false,
+          scrub: 1,
+          invalidateOnRefresh: true,
+          onUpdate(self) {
+            const nextProgress = self.progress;
+            if (Math.abs(nextProgress - processProgressRef.current) > 0.002) {
+              processProgressRef.current = nextProgress;
+              setProcessScrollProgress(nextProgress);
+            }
+
+            const nextPair = Math.min(pairs - 1, Math.round(nextProgress * (pairs - 1)));
+            if (nextPair !== processActiveRef.current) {
+              processActiveRef.current = nextPair;
+              setActiveProcessStep(nextPair);
+            }
+          },
+        });
+
+        tween = gsap.to(track, {
+          x: () => -getTravel(),
+          ease: "none",
+          scrollTrigger: st,
+        });
+
+        ScrollTrigger.addEventListener("refresh", () => tween?.invalidate());
+
+        return () => {
+          tween?.kill();
+          st.kill();
+        };
       },
     });
 
-    const tween = gsap.to(track, {
-      x: () => -getTravel(),
-      ease: "none",
-      scrollTrigger: st,
-    });
+    // After layout stabilizes (images/fonts), force a refresh so ScrollTrigger measures correctly
+    const rafId = requestAnimationFrame(() => ScrollTrigger.refresh());
 
-    const parallax = gsap.to(section.querySelectorAll("[data-process-parallax]"), {
-      yPercent: -10,
-      ease: "none",
-      scrollTrigger: {
-        trigger: section,
-        start: "top bottom",
-        end: "bottom top",
-        scrub: 1,
-      },
-    });
+    // Also refresh on a debounced resize
+    let resizeTimer: number | null = null;
+    const onResize = () => {
+      if (resizeTimer) window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+    };
+    window.addEventListener("resize", onResize);
 
     return () => {
-      tween.kill();
-      parallax.kill();
-      st.kill();
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", onResize);
+      // kill any ScrollTriggers created by this component
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+      if (lenis && lenisHandler && typeof lenis.off === "function") lenis.off("scroll", lenisHandler);
     };
   }, []);
 
