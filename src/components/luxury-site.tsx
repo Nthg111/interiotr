@@ -48,6 +48,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import LuxuryProcessWatch from "./luxury-process-watch";
 
 type IconComponent = React.ComponentType<{ className?: string }>;
 
@@ -1431,9 +1432,8 @@ export function LuxurySite() {
 
               <div className="flex justify-center lg:justify-end">
                 <div className="w-full max-w-[640px]">
-                  <ProcessClock
+                  <LuxuryProcessWatch
                     onOpen={(i) => setProcessModalIndex(i)}
-                    onActive={(i) => { /* optional - could sync left list */ }}
                     activeMicro={processActiveMicro}
                     onMicroHover={(idx) => setProcessActiveMicro(idx)}
                   />
