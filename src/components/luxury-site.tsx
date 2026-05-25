@@ -245,6 +245,164 @@ const circularProcessSteps: ProcessStep[] = [
   { title: "Handover", description: "Quality check and final client handover.", material: "Handover", detail: "Punchlist, training, and warranties.", texture: "" },
 ];
 
+function CircularProcess({
+  steps,
+  onOpen,
+}: {
+  steps: ProcessStep[];
+  onOpen: (i: number) => void;
+}) {
+  const prefersReducedMotion = useReducedMotion();
+  const [active, setActive] = useState(0);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onKey = (e: KeyboardEvent) => {
+      const len = steps.length;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        setActive((a) => (a + 1) % len);
+        e.preventDefault();
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        setActive((a) => (a - 1 + len) % len);
+        e.preventDefault();
+      } else if (e.key === "Enter" || e.key === " ") {
+        onOpen(active);
+        e.preventDefault();
+      }
+    };
+    el.addEventListener("keydown", onKey);
+    return () => el.removeEventListener("keydown", onKey);
+  }, [steps.length, onOpen, active]);
+
+  const handleMove = (e: React.MouseEvent) => {
+    if (!ref.current || prefersReducedMotion) return;
+    const rect = ref.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ rx: -(y * 6), ry: x * 6 });
+  };
+
+  const handleLeave = () => {
+    if (prefersReducedMotion) return;
+    setTilt({ rx: 0, ry: 0 });
+  };
+
+  const radius = 140; // visual radius in px
+
+  return (
+    <div
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      className="relative flex w-full items-center justify-center"
+      style={{ perspective: 900 }}
+      tabIndex={0}
+      role="group"
+      aria-label="Process circular navigation"
+    >
+      <motion.div
+        className="relative flex h-[360px] w-[360px] items-center justify-center rounded-full"
+        style={{ transformStyle: "preserve-3d", willChange: "transform" }}
+        animate={prefersReducedMotion ? {} : { rotateX: tilt.rx, rotateY: tilt.ry }}
+        transition={{ type: "spring", stiffness: 90, damping: 18 }}
+      >
+        {/* decorative depth */}
+        <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.03),transparent),linear-gradient(180deg,rgba(0,0,0,0.55),rgba(0,0,0,0.75))] shadow-[0_20px_80px_-30px_rgba(0,0,0,0.9)]" />
+
+        {/* connectors (SVG) */}
+        <svg className="absolute inset-0 h-full w-full" viewBox="0 0 360 360" aria-hidden>
+          <defs>
+            <linearGradient id="g1" x1="0%" x2="100%">
+              <stop offset="0%" stopColor="rgba(199,166,110,0.0)" />
+              <stop offset="60%" stopColor="rgba(199,166,110,0.14)" />
+              <stop offset="100%" stopColor="rgba(199,166,110,0.28)" />
+            </linearGradient>
+          </defs>
+          {steps.map((_, i) => {
+            const angle = (i / steps.length) * Math.PI * 2 - Math.PI / 2;
+            const x = 180 + Math.cos(angle) * radius;
+            const y = 180 + Math.sin(angle) * radius;
+            return (
+              <motion.path
+                key={i}
+                d={`M180,180 C${(180 + Math.cos(angle) * (radius * 0.45)).toFixed(2)},${(180 +
+                  Math.sin(angle) * (radius * 0.45)).toFixed(2)} ${(
+                  x * 0.95
+                ).toFixed(2)},${(y * 0.95).toFixed(2)} ${x.toFixed(2)},${y.toFixed(2)}`}
+                stroke="url(#g1)"
+                strokeWidth={1.5}
+                fill="none"
+                strokeLinecap="round"
+                initial={{ pathLength: 0 }}
+                animate={prefersReducedMotion ? {} : { pathLength: 1 }}
+                transition={{ duration: 0.9, ease: "easeOut" }}
+                className="opacity-60"
+              />
+            );
+          })}
+        </svg>
+
+        {/* steps */}
+        {steps.map((s, i) => {
+          const angle = (i / steps.length) * Math.PI * 2 - Math.PI / 2;
+          const x = Math.cos(angle) * radius;
+          const y = Math.sin(angle) * radius;
+          const isActive = i === active;
+          return (
+            <motion.button
+              key={s.title}
+              onMouseEnter={() => setActive(i)}
+              onFocus={() => setActive(i)}
+              onClick={() => onOpen(i)}
+              className="absolute flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md border border-white/6 text-center text-[color:var(--foreground)]"
+              style={{
+                left: `calc(50% + ${x}px)`,
+                top: `calc(50% + ${y}px)`,
+                width: isActive ? 86 : 66,
+                height: isActive ? 86 : 66,
+                transform: "translate(-50%,-50%)",
+                boxShadow: isActive
+                  ? "0 18px 60px -28px rgba(199,166,110,0.5)"
+                  : "0 10px 30px -20px rgba(0,0,0,0.6)",
+                willChange: "transform, box-shadow",
+              }}
+              whileHover={prefersReducedMotion ? {} : { scale: 1.06 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 180, damping: 18 }}
+              aria-label={`${s.title}`}
+            >
+              <div className="pointer-events-none flex flex-col items-center justify-center px-2">
+                <div className="text-xs opacity-70">{String(i + 1).padStart(2, "0")}</div>
+                <div className="mt-1 font-display text-[0.85rem] leading-tight">{s.title}</div>
+              </div>
+            </motion.button>
+          );
+        })}
+
+        {/* center info */}
+        <motion.div
+          className="absolute flex max-w-[58%] -translate-y-1/2 flex-col items-center justify-center text-center"
+          style={{ top: "50%" }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+        >
+          <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted)]">
+            {String(active + 1).padStart(2, "0")}
+          </p>
+          <h3 className="mt-2 font-display text-lg text-[color:var(--foreground)]">
+            {steps[active].title}
+          </h3>
+          <p className="mt-2 text-sm text-[color:var(--muted)]">{steps[active].description}</p>
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}
+
 const galleryFilters = ["All", "Residential", "Commercial", "Materials"] as const;
 
 function scrollToSection(id: string) {
@@ -921,54 +1079,73 @@ export function LuxurySite() {
           </div>
         </section>
 
-        <section id="process" className="py-10 sm:py-20">
-          <SectionShell
-            eyebrow="Process"
-            title="A concise, circular view of our six-step process."
-            description="A rotating 3D cycle summarizes the journey from first meeting to handover."
-          />
-
+        <section id="process" className="py-10 sm:py-20 overflow-visible">
           <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
-              <div>
-                <p className="text-sm text-[color:var(--muted)]">
-                  We keep the process clear and calm: from initial briefing to final handover.
-                  Below is a compact visual summary — tap any step on mobile to read more.
+            <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+              {/* Left: copy, indicators, CTA */}
+              <div className="order-2 lg:order-1">
+                <Badge>Process</Badge>
+                <p className="mt-4 text-sm text-[color:var(--muted)] max-w-xl">
+                  We keep the workflow clear and calm — from initial briefing through to final
+                  handover. Our approach balances conceptual clarity, material precision, and
+                  measured execution.
                 </p>
-                <div className="mt-6 process-list grid gap-3">
+
+                <div className="mt-6">
+                  <h2 className="font-display text-3xl leading-[0.95] text-[color:var(--foreground)] lg:text-4xl">
+                    A concise, circular view of our six-step process.
+                  </h2>
+                  <p className="mt-3 text-sm text-[color:var(--muted)] max-w-md">
+                    Each step is connected — hover or tap to reveal the step detail in the
+                    centre of the diagram.
+                  </p>
+                </div>
+
+                <div className="mt-6 flex gap-3">
+                  <MagneticButton onClick={() => scrollToSection("contact")}>
+                    Book Consultation
+                    <ArrowRight className="h-4 w-4" />
+                  </MagneticButton>
+                  <Button variant="outline" onClick={() => setProcessModalIndex(0)}>
+                    Explore
+                  </Button>
+                </div>
+
+                <div className="mt-8 grid grid-cols-3 gap-3">
                   {circularProcessSteps.map((s, i) => (
-                    <div key={s.title} className="rounded-xl border border-[color:var(--border)] bg-white/3 p-3">
-                      <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted)]">{String(i + 1).padStart(2, '0')}</p>
-                      <h4 className="mt-1 font-display text-lg text-[color:var(--foreground)]">{s.title}</h4>
+                    <div
+                      key={s.title}
+                      className="rounded-xl border border-[color:var(--border)] bg-white/3 p-3"
+                    >
+                      <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted)]">
+                        {String(i + 1).padStart(2, "0")}
+                      </p>
+                      <h4 className="mt-1 font-display text-lg text-[color:var(--foreground)]">
+                        {s.title}
+                      </h4>
                       <p className="mt-1 text-sm text-[color:var(--muted)]">{s.description}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="flex items-center justify-center">
-                <div className="process-3d" aria-hidden>
-                  <div className="process-rotator">
-                    {circularProcessSteps.map((s, i) => (
-                      <div
-                        key={s.title}
-                        className={`process-segment segment-${i}`}
-                        title={s.title}
-                        role="button"
-                        tabIndex={0}
-                        aria-label={`${s.title}: ${s.description}`}
-                        onClick={() => setProcessModalIndex(i)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") setProcessModalIndex(i);
-                        }}
-                      >
-                        <div className="label text-sm text-[color:var(--foreground)] text-center px-2">
-                          <div className="text-xs opacity-70">{String(i + 1).padStart(2, '0')}</div>
-                          <div className="font-display mt-1">{s.title}</div>
-                        </div>
+              {/* Right: framed interactive circular model */}
+              <div className="order-1 lg:order-2 flex justify-center">
+                <div className="w-full max-w-[540px]">
+                  <motion.div className="relative overflow-visible rounded-2xl border border-white/10 bg-white/6 p-6 shadow-[0_30px_110px_-50px_rgba(0,0,0,0.85)] backdrop-blur-2xl process-frame accent-gold-gradient process-float" initial={{ y: 0 }} animate={{ y: [0, -6, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
+                    <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full bg-[color:var(--accent)]/10 blur-3xl" aria-hidden />
+                    <div className="absolute -left-6 -bottom-6 h-36 w-36 rounded-full bg-white/8 blur-3xl" aria-hidden />
+
+                    <div className="mb-4 text-xs uppercase tracking-[0.28em] text-[color:var(--muted)]">
+                      Process Diagram
+                    </div>
+
+                    <div className="relative flex items-center justify-center">
+                      <div className="w-full max-w-[420px] process-focus">
+                        <CircularProcess steps={circularProcessSteps} onOpen={(i) => setProcessModalIndex(i)} />
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
             </div>
