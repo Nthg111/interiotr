@@ -540,11 +540,11 @@ export function LuxurySite() {
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {stats.map((item, index) => (
                   <Reveal key={item.label} delay={index * 0.08}>
-                    <Card className="h-full min-h-[8.75rem] bg-white/4 p-4 sm:p-5">
+                    <Card className="flex h-full min-h-[8.75rem] aspect-square flex-col bg-white/4 p-4 sm:p-5">
                       <p className="font-display text-2xl leading-none text-[color:var(--foreground)] sm:text-3xl">
                         {item.value}
                       </p>
-                      <p className="mt-3 max-w-[8.5rem] text-balance break-words text-[0.64rem] leading-4 tracking-[0.14em] text-[color:var(--muted)] sm:text-[0.72rem] sm:leading-5 sm:tracking-[0.2em]">
+                      <p className="mt-3 max-w-full [overflow-wrap:anywhere] text-[0.62rem] leading-4 tracking-[0.11em] text-[color:var(--muted)] sm:text-[0.7rem] sm:leading-5 sm:tracking-[0.16em]">
                         {item.label}
                       </p>
                     </Card>
