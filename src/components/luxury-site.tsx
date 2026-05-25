@@ -76,6 +76,14 @@ type GalleryItem = {
   accent: string;
 };
 
+type IntroScene = {
+  title: string;
+  subtitle: string;
+  badge: string;
+  icon: IconComponent;
+  accent: string;
+};
+
 const services: Service[] = [
   {
     title: "Interior Design",
@@ -317,6 +325,51 @@ const stats = [
 
 const galleryFilters = ["All", "Residential", "Commercial", "Materials"] as const;
 
+const introScenes: IntroScene[] = [
+  {
+    title: "Client briefing",
+    subtitle: "A calm handshake moment that sets scope, intent, and trust.",
+    badge: "01 / Brief",
+    icon: BadgeCheck,
+    accent: "from-stone-900 via-amber-900 to-neutral-700",
+  },
+  {
+    title: "Studio planning",
+    subtitle: "The office turns the brief into layouts, drawings, and a clear plan.",
+    badge: "02 / Office",
+    icon: LayoutGrid,
+    accent: "from-stone-950 via-zinc-800 to-neutral-600",
+  },
+  {
+    title: "Concept on laptop",
+    subtitle: "Design lines, visual options, and revisions come together on screen.",
+    badge: "03 / Draft",
+    icon: ScanSearch,
+    accent: "from-amber-950 via-stone-700 to-neutral-600",
+  },
+  {
+    title: "Site movement",
+    subtitle: "The team moves from studio to site with coordinated execution.",
+    badge: "04 / Site",
+    icon: MoveUpRight,
+    accent: "from-zinc-950 via-stone-800 to-neutral-700",
+  },
+  {
+    title: "Tools and materials",
+    subtitle: "Drills, cutters, timber, and fittings bring the plan into reality.",
+    badge: "05 / Build",
+    icon: Hammer,
+    accent: "from-amber-900 via-stone-700 to-zinc-700",
+  },
+  {
+    title: "Final reveal",
+    subtitle: "The finished luxury interior appears after the sequence completes.",
+    badge: "06 / Output",
+    icon: Sparkles,
+    accent: "from-stone-900 via-amber-800 to-neutral-700",
+  },
+];
+
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -396,6 +449,7 @@ export function LuxurySite() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loaderVisible, setLoaderVisible] = useState(true);
   const [loaderProgress, setLoaderProgress] = useState(12);
+  const [introPhase, setIntroPhase] = useState(0);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [selectedGalleryFilter, setSelectedGalleryFilter] = useState<(typeof galleryFilters)[number]>("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -439,15 +493,25 @@ export function LuxurySite() {
   }, []);
 
   useEffect(() => {
-    const first = window.setTimeout(() => setLoaderProgress(72), 450);
-    const second = window.setTimeout(() => setLoaderProgress(100), 980);
-    const third = window.setTimeout(() => setLoaderVisible(false), 1650);
+    const reducedMotion = prefersReducedMotion === true;
+    const phaseDurations = reducedMotion ? [0, 180, 360, 540, 720, 900] : [0, 520, 1040, 1560, 2080, 2600];
+    const progressValues = [18, 34, 52, 68, 84, 100];
+
+    const timers = phaseDurations.map((delay, index) =>
+      window.setTimeout(() => {
+        setIntroPhase(index);
+        setLoaderProgress(progressValues[index]);
+      }, delay),
+    );
+
+    const hideDelay = reducedMotion ? 1150 : 3400;
+    const closeTimer = window.setTimeout(() => setLoaderVisible(false), hideDelay);
+
     return () => {
-      clearTimeout(first);
-      clearTimeout(second);
-      clearTimeout(third);
+      timers.forEach((timer) => clearTimeout(timer));
+      clearTimeout(closeTimer);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     const ticker = window.setInterval(() => {
@@ -457,6 +521,8 @@ export function LuxurySite() {
   }, []);
 
   useEffect(() => {
+    if (loaderVisible) return;
+
     const heroLines = document.querySelectorAll("[data-hero-line]");
     gsap.fromTo(
       heroLines,
@@ -489,8 +555,9 @@ export function LuxurySite() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.8, ease: "easeOut" } }}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(199,166,110,0.15),transparent_40%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent)]" />
-            <div className="relative mx-auto flex w-full max-w-2xl flex-col items-center gap-10 px-6 text-center">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(199,166,110,0.18),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent)]" />
+            <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.2),rgba(199,166,110,0.8),rgba(199,166,110,0.2),transparent)]" />
+            <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center gap-8 px-6 text-center">
               <motion.div
                 className="flex flex-col items-center gap-4"
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -502,32 +569,90 @@ export function LuxurySite() {
                 </div>
                 <div className="space-y-2">
                   <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--muted)]">
-                    Interio & Trade associates
+                    Construction intro sequence
                   </p>
-                  <h1 className="font-display text-5xl leading-none text-[color:var(--foreground)] sm:text-6xl">
-                    Crafting Timeless Luxury
+                  <h1 className="font-display text-4xl leading-none text-[color:var(--foreground)] sm:text-6xl">
+                    From brief to handover
                   </h1>
                 </div>
               </motion.div>
 
-              <div className="w-full space-y-3">
-                <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[color:var(--muted)]">
-                  <span>Loading experience</span>
-                  <span>{Math.round(loaderProgress)}%</span>
-                </div>
-                <div className="h-1 overflow-hidden rounded-full bg-white/8">
-                  <motion.div
-                    className="h-full rounded-full bg-[linear-gradient(90deg,#8f6c39,#d5b77a,#fff4d8,#d5b77a,#8f6c39)]"
-                    animate={{ width: `${loaderProgress}%` }}
-                    transition={{ duration: 0.75, ease: "easeOut" }}
-                  />
-                </div>
-              </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={introScenes[introPhase].title}
+                  className="w-full max-w-3xl"
+                  initial={{ opacity: 0, y: 18, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -12, scale: 0.98 }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <div className="grid gap-4 rounded-[2rem] border border-[color:var(--border)] bg-white/5 p-5 shadow-[0_28px_90px_-55px_rgba(0,0,0,0.8)] backdrop-blur-2xl sm:p-6 md:grid-cols-[0.95fr_1.05fr] md:items-center md:p-7">
+                    <div className={`rounded-[1.75rem] bg-gradient-to-br ${introScenes[introPhase].accent} p-6 text-left`}>
+                      <div className="flex items-center justify-between text-xs uppercase tracking-[0.32em] text-white/65">
+                        <span>{introScenes[introPhase].badge}</span>
+                        <span>{String(introPhase + 1).padStart(2, "0")}</span>
+                      </div>
+                      <div className="mt-8 flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-black/20 text-white shadow-[0_18px_40px_-24px_rgba(0,0,0,0.75)]">
+                        {(() => {
+                          const SceneIcon = introScenes[introPhase].icon;
+                          return <SceneIcon className="h-10 w-10" />;
+                        })()}
+                      </div>
+                      <p className="mt-6 max-w-sm text-sm leading-7 text-white/75">
+                        {introScenes[introPhase].subtitle}
+                      </p>
+                    </div>
 
-              <p className="max-w-xl text-sm leading-7 text-[color:var(--muted)] sm:text-base">
-                An architectural interior studio and material partner shaping calm, precise, and
-                enduring spaces.
-              </p>
+                    <div className="space-y-5 text-left">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--muted)]">
+                          Scene {String(introPhase + 1).padStart(2, "0")}
+                        </p>
+                        <h2 className="mt-3 font-display text-3xl leading-tight text-[color:var(--foreground)] sm:text-4xl">
+                          {introScenes[introPhase].title}
+                        </h2>
+                      </div>
+
+                      <p className="max-w-xl text-sm leading-7 text-[color:var(--muted)] sm:text-base">
+                        {introScenes[introPhase].subtitle}
+                      </p>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[color:var(--muted)]">
+                          <span>Building the story</span>
+                          <span>{Math.round(loaderProgress)}%</span>
+                        </div>
+                        <div className="h-1 overflow-hidden rounded-full bg-white/8">
+                          <motion.div
+                            className="h-full rounded-full bg-[linear-gradient(90deg,#8f6c39,#d5b77a,#fff4d8,#d5b77a,#8f6c39)]"
+                            animate={{ width: `${loaderProgress}%` }}
+                            transition={{ duration: 0.55, ease: "easeOut" }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        {introScenes.map((scene, index) => {
+                          const isActive = index === introPhase;
+                          return (
+                            <div
+                              key={scene.title}
+                              className={`rounded-2xl border px-3 py-3 text-left transition-all duration-300 ${
+                                isActive
+                                  ? "border-[color:var(--accent)]/55 bg-[color:var(--accent)]/12 text-[color:var(--foreground)]"
+                                  : "border-[color:var(--border)] bg-white/5 text-[color:var(--muted)]"
+                              }`}
+                            >
+                              <p className="text-[0.65rem] uppercase tracking-[0.28em]">{scene.badge}</p>
+                              <p className="mt-2 text-sm leading-6">{scene.title}</p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </motion.div>
         ) : null}
