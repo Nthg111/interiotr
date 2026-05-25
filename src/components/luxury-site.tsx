@@ -1401,28 +1401,8 @@ export function LuxurySite() {
                   Precision, timing, execution, and delivery — visualized like a luxury timepiece.
                 </p>
 
-                <div className="mt-8 space-y-4">
-                  {processClockData.flatMap((z) => z.steps).map((label, i) => (
-                    <button
-                      key={label}
-                      onMouseEnter={() => {
-                        const zoneIdx = Math.floor(i / 3);
-                        setProcessActiveIndex(zoneIdx);
-                        setProcessActiveMicro(i);
-                      }}
-                      onMouseLeave={() => setProcessActiveMicro(null)}
-                      onClick={() => setProcessModalIndex(i)}
-                      className="group flex w-full items-start gap-4 rounded-xl border border-[color:var(--border)] bg-white/3 p-4 transition-shadow hover:shadow-[0_30px_80px_-40px_rgba(0,0,0,0.6)]"
-                    >
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[color:var(--border)] bg-white/5 text-[color:var(--accent)]">
-                        <span className="text-xs">{String(i + 1).padStart(2, '0')}</span>
-                      </div>
-                      <div className="text-left">
-                        <p className="text-sm font-medium text-[color:var(--foreground)]">{label}</p>
-                        <p className="mt-1 text-xs text-[color:var(--muted)]">{/* small supporting phrase could go here */}</p>
-                      </div>
-                    </button>
-                  ))}
+                <div className="mt-8">
+                  <p className="text-sm text-[color:var(--muted)]">Explore the twelve micro-steps directly on the watch dial — hover or tap a marker.</p>
                 </div>
 
                 <div className="mt-8">

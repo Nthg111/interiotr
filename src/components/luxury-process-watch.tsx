@@ -39,7 +39,7 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
     if (prefersReduced) return;
     const el = containerRef.current;
     if (!el) return;
-    const obs = new IntersectionObserver((entries) => {
+          const obs = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
           const tl = gsap.timeline();
@@ -57,6 +57,7 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
             "<0.05"
           );
           tl.to(el.querySelectorAll('.lux-mini'), { scale: 1, opacity: 1, stagger: 0.04, ease: 'back.out(1.2)' }, '<0.2');
+          tl.fromTo(el.querySelectorAll('.lux-major'), { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, stagger: 0.18, duration: 0.8, ease: 'power2.out' }, '<0.1');
           obs.disconnect();
         }
       }
@@ -104,7 +105,11 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
                 </filter>
               </defs>
 
+              {/* outer decorative rings */}
+              <circle cx="210" cy="210" r="190" fill="none" stroke="#0b0b0b" strokeWidth={2} />
+              <circle cx="210" cy="210" r="182" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth={1} />
               <circle cx="210" cy="210" r="168" fill="url(#goldGrad)" opacity="0.03" />
+              <circle cx="210" cy="210" r="174" fill="none" stroke="rgba(199,166,110,0.06)" strokeWidth={1} />
 
               {/* tick marks */}
               {Array.from({ length: 60 }).map((_, i) => {
@@ -128,9 +133,36 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
                 const y = 210 + Math.sin(a) * r;
                 const label = idx === 0 ? 'Consultation' : idx === 1 ? 'Design' : idx === 2 ? 'Execution' : 'Delivery';
                 return (
-                  <g key={pos}>
-                    <circle cx={x} cy={y} r={8} fill="#c7a66e" opacity={0.12} />
-                    <text x={x} y={y - 18} fill="#c7a66e" fontSize={10} fontFamily="serif" textAnchor="middle">{label}</text>
+                  <g key={pos} className="lux-major" transform={`translate(${x},${y})`}>
+                    <g className="lux-major-badge">
+                      <circle cx={0} cy={0} r={26} fill="#0b0b0b" stroke="#c7a66e22" strokeWidth={1} />
+                      <circle cx={0} cy={0} r={18} fill="url(#goldGrad)" opacity={0.06} />
+                      <circle cx={0} cy={0} r={10} fill="#0b0b0b" stroke="#ffffff08" />
+                      {/* simple icon placeholders */}
+                      {idx === 0 && (
+                        <g transform="translate(-4,-2) scale(0.7)" fill="#c7a66e">
+                          <rect x={-6} y={-4} width={12} height={8} rx={2} />
+                          <path d="M-2,6 L2,6 L0,9 Z" />
+                        </g>
+                      )}
+                      {idx === 1 && (
+                        <g transform="translate(-1,-1) scale(0.9)" stroke="#c7a66e" strokeWidth={1.2} fill="none">
+                          <path d="M-6,6 L6,-6" />
+                          <path d="M-2,4 L4,-6" />
+                        </g>
+                      )}
+                      {idx === 2 && (
+                        <g transform="translate(-1,0) scale(0.8)" fill="#c7a66e">
+                          <rect x={-6} y={-2} width={12} height={6} rx={2} />
+                        </g>
+                      )}
+                      {idx === 3 && (
+                        <g transform="translate(-2,-1) scale(0.8)" fill="#c7a66e">
+                          <rect x={-5} y={-4} width={10} height={8} rx={1} />
+                        </g>
+                      )}
+                    </g>
+                    <text x={0} y={44} fill="#c7a66e" fontSize={10} fontFamily="serif" textAnchor="middle">{label}</text>
                   </g>
                 );
               })}
@@ -152,9 +184,18 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
                       stroke="#c7a66e1a"
                       strokeWidth={1}
                     />
+                    {/* small engraved numbers for a subset of indices */}
+                    {([0,1,3,4,6,7,9,10] as number[]).includes(i) ? (
+                      <text x={0} y={2} textAnchor="middle" fontSize={9} fontFamily="serif" fill="#ffffffaa">{String(i + 1)}</text>
+                    ) : null}
                   </g>
                 );
               })}
+
+              {/* glass reflection path */}
+              <g>
+                <path d="M60,40 C160,10 260,10 360,40 L360,60 C260,30 160,30 60,60 Z" fill="rgba(255,255,255,0.03)" />
+              </g>
             </svg>
 
             <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
