@@ -571,6 +571,105 @@ function CircularProcess({
 
 const galleryFilters = ["All", "Residential", "Commercial", "Materials"] as const;
 
+// Data for a luxury process clock
+const processClockData = [
+  { zone: "Discovery", steps: ["Consultation", "Site Visit", "Moodboarding"] },
+  { zone: "Design", steps: ["Layout Planning", "Material Selection", "3D Visualization"] },
+  { zone: "Execution", steps: ["Fabrication", "Site Coordination", "Installation"] },
+  { zone: "Delivery", steps: ["Styling", "Quality Check", "Final Handover"] },
+];
+
+function ProcessClock({ onOpen, onActive }: { onOpen: (i: number) => void; onActive?: (i: number) => void }) {
+  const prefersReducedMotion = useReducedMotion();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const handRef = useRef<HTMLDivElement | null>(null);
+  const thinRef = useRef<HTMLDivElement | null>(null);
+  const ringRef = useRef<HTMLDivElement | null>(null);
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const allMicro = useMemo(() => processClockData.flatMap((z) => z.steps), []);
+  const [activeZone, setActiveZone] = useState(0);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !tlRef.current) {
+          const tl = gsap.timeline();
+          tl.fromTo(ringRef.current, { rotate: -40, opacity: 0 }, { rotate: 0, opacity: 1, duration: 0.9, ease: 'power3.out' });
+          tl.fromTo(handRef.current, { rotate: -720 }, { rotate: 0, duration: 1.2, ease: 'elastic.out(1,0.6)' }, '<0.05');
+          tl.fromTo(thinRef.current, { rotate: -540 }, { rotate: 0, duration: 1.4, ease: 'power3.out' }, '<0.02');
+          tl.fromTo(el.querySelectorAll('.process-mini'), { scale: 0.2, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, stagger: 0.05, ease: 'back.out(1.2)' }, '-=0.9');
+          tlRef.current = tl;
+          obs.disconnect();
+        }
+      });
+    }, { threshold: 0.25 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [prefersReducedMotion]);
+
+  const zoneAngle = (zi: number) => (zi * 90) - 90;
+
+  const hoverZone = (idx: number) => {
+    setActiveZone(idx);
+    onActive?.(idx * 3); // map zone to micro index roughly
+    const angle = zoneAngle(idx);
+    if (!prefersReducedMotion && handRef.current) {
+      gsap.to(handRef.current, { rotate: angle, duration: 0.6, ease: 'power3.out' });
+      gsap.to(thinRef.current, { rotate: angle * 1.02, duration: 0.7, ease: 'power3.out' });
+    } else if (handRef.current) {
+      handRef.current.style.transform = `rotate(${angle}deg)`;
+    }
+  };
+
+  return (
+    <div ref={containerRef} className="relative w-full flex items-center justify-center">
+      <div className="relative z-10">
+        <div className="process-frame relative flex items-center justify-center p-6">
+          <div ref={ringRef} className="absolute h-[380px] w-[380px] rounded-full">
+            <svg className="h-full w-full" viewBox="0 0 380 380" aria-hidden>
+              <circle cx={190} cy={190} r={168} stroke="rgba(255,255,255,0.03)" strokeWidth={1} fill="none" />
+              {Array.from({ length: 60 }).map((_, i) => {
+                const a = (i / 60) * Math.PI * 2 - Math.PI / 2;
+                const r1 = 168;
+                const r2 = i % 5 === 0 ? 158 : 162;
+                const x1 = 190 + Math.cos(a) * r1;
+                const y1 = 190 + Math.sin(a) * r1;
+                const x2 = 190 + Math.cos(a) * r2;
+                const y2 = 190 + Math.sin(a) * r2;
+                return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={i % 5 === 0 ? 'rgba(199,166,110,0.12)' : 'rgba(255,255,255,0.03)'} strokeWidth={i % 5 === 0 ? 1.2 : 0.6} strokeLinecap="round" />;
+              })}
+            </svg>
+          </div>
+
+          <div className="absolute h-[320px] w-[320px] rounded-full">
+            {allMicro.map((m, i) => {
+              const a = (i / allMicro.length) * Math.PI * 2 - Math.PI / 2;
+              const r = 140;
+              const x = Math.cos(a) * r;
+              const y = Math.sin(a) * r;
+              return <div key={m} className="process-mini absolute bg-white/10 rounded-full" style={{ left: `calc(50% + ${x}px)`, top: `calc(50% + ${y}px)`, width: 8, height: 8 }} />;
+            })}
+          </div>
+
+          <div className="absolute flex items-center justify-center">
+            <div ref={handRef} className="absolute origin-bottom h-[110px] w-[8px] rounded-[6px] bg-gradient-to-b from-[rgba(199,166,110,0.98)] to-[rgba(199,166,110,0.6)] shadow-[0_20px_60px_-30px_rgba(199,166,110,0.35)]" style={{ bottom: '50%', left: '50%', transformOrigin: '50% 100%' }} />
+            <div ref={thinRef} className="absolute origin-bottom h-[72px] w-[4px] rounded-[4px] bg-[rgba(255,244,230,0.9)] opacity-90" style={{ bottom: '50%', left: '50%', transformOrigin: '50% 100%' }} />
+            <div className="absolute h-6 w-6 rounded-full bg-[rgba(255,244,230,0.02)] border border-white/8" style={{ left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }} />
+          </div>
+
+        </div>
+      </div>
+
+      <div className="absolute left-4 top-4 flex flex-col gap-2 z-20 pointer-events-none">
+        {/* ambient particles or small UI elements could be added here */}
+      </div>
+    </div>
+  );
+}
+
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -1261,79 +1360,50 @@ export function LuxurySite() {
           </div>
         </section>
 
-        <section id="process" className="py-10 sm:py-20 overflow-visible">
+        <section id="process" className="py-12 sm:py-20">
           <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-            <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-              {/* Left: copy, indicators, CTA */}
-              <div className="order-2 lg:order-1">
-                <Badge>Process</Badge>
-                <p className="mt-4 text-sm text-[color:var(--muted)] max-w-xl">
-                  We keep the workflow clear and calm — from initial briefing through to final
-                  handover. Our approach balances conceptual clarity, material precision, and
-                  measured execution.
+            <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
+              <div className="lg:pr-8">
+                <Badge>PROCESS</Badge>
+                <h2 className="mt-4 font-display text-4xl leading-[0.95] text-[color:var(--foreground)]">
+                  A concise, circular view of our six-step process.
+                </h2>
+                <p className="mt-4 max-w-lg text-sm text-[color:var(--muted)]">
+                  Precision, timing, execution, and delivery — visualized like a luxury timepiece.
                 </p>
 
-                <div className="mt-6">
-                  <h2 className="font-display text-3xl leading-[0.95] text-[color:var(--foreground)] lg:text-4xl">
-                    A concise, circular view of our six-step process.
-                  </h2>
-                  <p className="mt-3 text-sm text-[color:var(--muted)] max-w-md">
-                    Each step is connected — hover or tap to reveal the step detail in the
-                    centre of the diagram.
-                  </p>
+                <div className="mt-8 space-y-4">
+                  {processClockData.flatMap((z) => z.steps).map((label, i) => (
+                    <button
+                      key={label}
+                      onMouseEnter={() => {
+                        // compute zone index
+                        const zoneIdx = Math.floor(i / 3);
+                        // communicate to clock
+                        // set active micro index via onActive callback
+                      }}
+                      onClick={() => setProcessModalIndex(i)}
+                      className="group flex w-full items-start gap-4 rounded-xl border border-[color:var(--border)] bg-white/3 p-4 transition-shadow hover:shadow-[0_30px_80px_-40px_rgba(0,0,0,0.6)]"
+                    >
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[color:var(--border)] bg-white/5 text-[color:var(--accent)]">
+                        <span className="text-xs">{String(i + 1).padStart(2, '0')}</span>
+                      </div>
+                      <div className="text-left">
+                        <p className="text-sm font-medium text-[color:var(--foreground)]">{label}</p>
+                        <p className="mt-1 text-xs text-[color:var(--muted)]">{/* small supporting phrase could go here */}</p>
+                      </div>
+                    </button>
+                  ))}
                 </div>
 
-                <div className="mt-6 flex gap-3">
-                  <MagneticButton onClick={() => scrollToSection("contact")}>
-                    Book Consultation
-                    <ArrowRight className="h-4 w-4" />
-                  </MagneticButton>
-                  <Button variant="outline" onClick={() => setProcessModalIndex(0)}>
-                    Explore
-                  </Button>
-                </div>
-
-                <div className="mt-8 relative">
-                  <div className="absolute left-8 top-6 bottom-6 w-px bg-white/6" />
-                  <div className="space-y-6 pl-16">
-                    { [0,1,4,5].map((mi, idx) => {
-                        const s = circularProcessSteps[mi];
-                        const Icon = mi === 0 ? Quote : mi === 1 ? LayoutGrid : mi === 4 ? Hammer : Boxes;
-                        const nearestMain = getNearestMain(processActiveIndex);
-                        const isActiveMain = nearestMain === mi;
-                        return (
-                          <button key={s.title} onClick={() => setProcessModalIndex(mi)} className={`group flex w-full items-start gap-4 text-left ${isActiveMain ? 'opacity-100' : 'opacity-70'}`}>
-                            <div className={`flex h-12 w-12 items-center justify-center rounded-full border bg-black/40 ${isActiveMain ? 'border-[color:var(--accent)] bg-[color:var(--accent)]/12 shadow-[0_10px_40px_-20px_rgba(199,166,110,0.22)]' : ''}`}>
-                              <Icon className="h-5 w-5 text-[color:var(--accent)]" />
-                            </div>
-                            <div>
-                              <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted)]">{s.title}</p>
-                              <p className="mt-2 max-w-sm text-sm text-[color:var(--muted)]">{s.description}</p>
-                            </div>
-                          </button>
-                        )
-                      }) }
-                  </div>
+                <div className="mt-8">
+                  <MagneticButton onClick={() => scrollToSection('contact')}>Book Consultation <ArrowRight className="h-4 w-4" /></MagneticButton>
                 </div>
               </div>
 
-              {/* Right: framed interactive circular model */}
-              <div className="order-1 lg:order-2 flex justify-center">
-                <div className="w-full max-w-[540px]">
-                  <motion.div className="relative overflow-visible rounded-2xl border border-white/10 bg-white/6 p-6 shadow-[0_30px_110px_-50px_rgba(0,0,0,0.85)] backdrop-blur-2xl process-frame accent-gold-gradient process-float" initial={{ y: 0 }} animate={{ y: [0, -6, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
-                    <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full bg-[color:var(--accent)]/10 blur-3xl" aria-hidden />
-                    <div className="absolute -left-6 -bottom-6 h-36 w-36 rounded-full bg-white/8 blur-3xl" aria-hidden />
-
-                    <div className="mb-4 text-xs uppercase tracking-[0.28em] text-[color:var(--muted)]">
-                      Process Diagram
-                    </div>
-
-                    <div className="relative flex items-center justify-center">
-                        <div className="w-full max-w-[420px] process-focus">
-                        <CircularProcess steps={circularProcessSteps} onOpen={(i) => setProcessModalIndex(i)} onActiveChange={(i) => setProcessActiveIndex(i)} />
-                      </div>
-                    </div>
-                  </motion.div>
+              <div className="flex justify-center lg:justify-end">
+                <div className="w-full max-w-[640px]">
+                  <ProcessClock onOpen={(i) => setProcessModalIndex(i)} onActive={(i) => { /* optional - could sync left list */ }} />
                 </div>
               </div>
             </div>
