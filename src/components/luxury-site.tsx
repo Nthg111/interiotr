@@ -9,13 +9,11 @@ import {
   useScroll,
   useSpring,
 } from "framer-motion";
-import gsap from "gsap";
 import {
   ArrowRight,
   BadgeCheck,
   ChevronLeft,
   ChevronRight,
-  CircleDashed,
   LayoutGrid,
   Mail,
   MapPinned,
@@ -29,11 +27,8 @@ import {
   SlidersHorizontal,
   Sparkles,
   SunMedium,
-  Layers3,
-  Ruler,
   Hammer,
   Building2,
-  Boxes,
   Send,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -61,26 +56,10 @@ type Project = {
   accent: string;
 };
 
-type Material = {
-  title: string;
-  description: string;
-  tag: string;
-  accent: string;
-  icon: IconComponent;
-};
-
 type GalleryItem = {
   title: string;
   category: "Residential" | "Commercial" | "Materials";
   note: string;
-  accent: string;
-};
-
-type IntroScene = {
-  title: string;
-  subtitle: string;
-  badge: string;
-  icon: IconComponent;
   accent: string;
 };
 
@@ -167,65 +146,6 @@ const projects: Project[] = [
     description: "An indoor-outdoor villa concept with calm tonal depth and layered transparency.",
     tone: "from-amber-950 via-stone-700 to-zinc-500",
     accent: "Resort Flow",
-  },
-];
-
-const materials: Material[] = [
-  {
-    title: "Plywood",
-    description: "Precision-graded boards for dependable cabinetry and interior frameworks.",
-    tag: "Core Supply",
-    accent: "from-amber-900 via-stone-700 to-neutral-500",
-    icon: Layers3,
-  },
-  {
-    title: "Laminates",
-    description: "Matte, woodgrain, and stone-effect finishes for premium surface expression.",
-    tag: "Surface Finish",
-    accent: "from-stone-900 via-zinc-700 to-neutral-500",
-    icon: Sparkles,
-  },
-  {
-    title: "Veneers",
-    description: "Natural grain selections for refined joinery and feature wall detailing.",
-    tag: "Texture",
-    accent: "from-amber-950 via-amber-800 to-stone-600",
-    icon: CircleDashed,
-  },
-  {
-    title: "Marble",
-    description: "Statement slabs for counters, niches, and luxury hospitality moments.",
-    tag: "Stone",
-    accent: "from-zinc-950 via-stone-700 to-slate-500",
-    icon: Ruler,
-  },
-  {
-    title: "Tiles",
-    description: "Contemporary formats with stone, terrazzo, and matte mineral character.",
-    tag: "Cladding",
-    accent: "from-neutral-950 via-stone-700 to-neutral-500",
-    icon: Boxes,
-  },
-  {
-    title: "Glass",
-    description: "Clear, tinted, and textured solutions for depth, separation, and light.",
-    tag: "Transparency",
-    accent: "from-slate-900 via-zinc-700 to-stone-400",
-    icon: ScanSearch,
-  },
-  {
-    title: "Lighting",
-    description: "Ambient, accent, and architectural lighting that shapes mood elegantly.",
-    tag: "Atmosphere",
-    accent: "from-amber-900 via-orange-700 to-stone-500",
-    icon: Sparkles,
-  },
-  {
-    title: "Modular Accessories",
-    description: "Accessories and fittings that complete efficient, elegant interiors.",
-    tag: "Detail",
-    accent: "from-stone-800 via-neutral-700 to-zinc-500",
-    icon: MoveUpRight,
   },
 ];
 
@@ -325,51 +245,6 @@ const stats = [
 
 const galleryFilters = ["All", "Residential", "Commercial", "Materials"] as const;
 
-const introScenes: IntroScene[] = [
-  {
-    title: "Client briefing",
-    subtitle: "A calm handshake moment that sets scope, intent, and trust.",
-    badge: "01 / Brief",
-    icon: BadgeCheck,
-    accent: "from-stone-900 via-amber-900 to-neutral-700",
-  },
-  {
-    title: "Studio planning",
-    subtitle: "The office turns the brief into layouts, drawings, and a clear plan.",
-    badge: "02 / Office",
-    icon: LayoutGrid,
-    accent: "from-stone-950 via-zinc-800 to-neutral-600",
-  },
-  {
-    title: "Concept on laptop",
-    subtitle: "Design lines, visual options, and revisions come together on screen.",
-    badge: "03 / Draft",
-    icon: ScanSearch,
-    accent: "from-amber-950 via-stone-700 to-neutral-600",
-  },
-  {
-    title: "Site movement",
-    subtitle: "The team moves from studio to site with coordinated execution.",
-    badge: "04 / Site",
-    icon: MoveUpRight,
-    accent: "from-zinc-950 via-stone-800 to-neutral-700",
-  },
-  {
-    title: "Tools and materials",
-    subtitle: "Drills, cutters, timber, and fittings bring the plan into reality.",
-    badge: "05 / Build",
-    icon: Hammer,
-    accent: "from-amber-900 via-stone-700 to-zinc-700",
-  },
-  {
-    title: "Final reveal",
-    subtitle: "The finished luxury interior appears after the sequence completes.",
-    badge: "06 / Output",
-    icon: Sparkles,
-    accent: "from-stone-900 via-amber-800 to-neutral-700",
-  },
-];
-
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -447,9 +322,6 @@ function MagneticButton({
 export function LuxurySite() {
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [loaderVisible, setLoaderVisible] = useState(true);
-  const [loaderProgress, setLoaderProgress] = useState(12);
-  const [introPhase, setIntroPhase] = useState(0);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [selectedGalleryFilter, setSelectedGalleryFilter] = useState<(typeof galleryFilters)[number]>("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -493,224 +365,26 @@ export function LuxurySite() {
   }, []);
 
   useEffect(() => {
-    const reducedMotion = prefersReducedMotion === true;
-    const phaseDurations = reducedMotion ? [0, 180, 360, 540, 720, 900] : [0, 520, 1040, 1560, 2080, 2600];
-    const progressValues = [18, 34, 52, 68, 84, 100];
-
-    const timers = phaseDurations.map((delay, index) =>
-      window.setTimeout(() => {
-        setIntroPhase(index);
-        setLoaderProgress(progressValues[index]);
-      }, delay),
-    );
-
-    const hideDelay = reducedMotion ? 1150 : 3400;
-    const closeTimer = window.setTimeout(() => setLoaderVisible(false), hideDelay);
-
-    return () => {
-      timers.forEach((timer) => clearTimeout(timer));
-      clearTimeout(closeTimer);
-    };
-  }, [prefersReducedMotion]);
-
-  useEffect(() => {
     const ticker = window.setInterval(() => {
       setActiveTestimonial((value) => (value + 1) % testimonials.length);
     }, 6500);
     return () => window.clearInterval(ticker);
   }, []);
 
-  useEffect(() => {
-    if (loaderVisible) return;
-
-    const heroLines = document.querySelectorAll("[data-hero-line]");
-    gsap.fromTo(
-      heroLines,
-      { y: 28, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 1.1,
-        stagger: 0.08,
-        ease: "power4.out",
-      },
-    );
-  }, [loaderVisible]);
-
   const themeIsDark = resolvedTheme ? resolvedTheme === "dark" : true;
 
   return (
-    <div className="relative isolate overflow-hidden">
+    <div className="relative isolate overflow-hidden bg-[color:var(--background)]">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(199,166,110,0.12),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.06),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent_22%,transparent_82%,rgba(10,10,10,0.1))]"
+      />
       <motion.div
         aria-hidden
         className="pointer-events-none fixed left-0 top-0 z-[60] h-1 origin-left bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.95),rgba(255,255,255,0.95),rgba(199,166,110,0.95),transparent)]"
         style={{ scaleX: progress }}
       />
 
-      <AnimatePresence>
-        {loaderVisible ? (
-          <motion.div
-            key="preloader"
-            className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-[color:var(--background)]"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.8, ease: "easeOut" } }}
-          >
-            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(12,11,10,1),rgba(20,17,14,1)_45%,rgba(12,11,10,1))]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(199,166,110,0.18),transparent_34%),radial-gradient(circle_at_78%_30%,rgba(255,255,255,0.08),transparent_22%)]" />
-            <motion.div
-              aria-hidden
-              className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.18),rgba(199,166,110,0.75),rgba(255,255,255,0.9),rgba(199,166,110,0.75),rgba(199,166,110,0.18),transparent)]"
-              animate={{ opacity: [0.55, 1, 0.55] }}
-              transition={{ duration: 2.4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-            />
-
-            <div className="relative mx-auto w-full max-w-7xl px-6">
-              <div className="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
-                <motion.div
-                  className="space-y-6 text-center lg:text-left"
-                  initial={{ opacity: 0, y: 22 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border border-[color:var(--border)] bg-white/5 text-2xl font-semibold tracking-[0.35em] text-[color:var(--accent)] backdrop-blur-xl lg:mx-0">
-                    ITA
-                  </div>
-                  <div className="space-y-3">
-                    <p className="text-xs uppercase tracking-[0.42em] text-[color:var(--muted)]">
-                      Construction motion intro
-                    </p>
-                    <h1 className="font-display text-4xl leading-none text-[color:var(--foreground)] sm:text-6xl lg:text-[4.4rem]">
-                      From brief to handover
-                    </h1>
-                    <p className="mx-auto max-w-xl text-sm leading-7 text-[color:var(--muted)] lg:mx-0 sm:text-base">
-                      A single animated path from handshake to site work to final output.
-                    </p>
-                  </div>
-                </motion.div>
-
-                <div className="relative">
-                  <div className="absolute inset-0 rounded-[2.5rem] bg-[radial-gradient(circle_at_20%_20%,rgba(199,166,110,0.14),transparent_30%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.08),transparent_24%)] blur-2xl" />
-                  <div className="relative overflow-hidden rounded-[2.25rem] border border-[color:var(--border)] bg-black/35 p-5 shadow-[0_30px_100px_-60px_rgba(0,0,0,0.9)] sm:p-6">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.34em] text-[color:var(--muted)]">
-                          Intro sequence
-                        </p>
-                        <p className="mt-2 font-display text-2xl text-[color:var(--foreground)]">
-                          One route, six beats.
-                        </p>
-                      </div>
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--border)] bg-white/5 text-[color:var(--accent)]">
-                        <SlidersHorizontal className="h-5 w-5" />
-                      </div>
-                    </div>
-
-                    <div className="relative mt-6 h-[22rem] overflow-hidden rounded-[1.75rem] border border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))]">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(199,166,110,0.16),transparent_38%),linear-gradient(135deg,rgba(16,13,10,0.82),rgba(10,10,10,0.94))]" />
-                      <motion.div
-                        aria-hidden
-                        className="absolute left-[10%] top-[20%] h-20 w-20 rounded-full border border-white/10 bg-white/6 backdrop-blur-xl"
-                        animate={{ x: [0, 18, 0], y: [0, 12, 0], scale: [1, 1.04, 1] }}
-                        transition={{ duration: 4.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                      >
-                        <div className="flex h-full w-full items-center justify-center text-[color:var(--accent)]">
-                          <BadgeCheck className="h-6 w-6" />
-                        </div>
-                      </motion.div>
-                      <motion.div
-                        aria-hidden
-                        className="absolute right-[12%] top-[18%] h-24 w-24 rounded-full border border-white/10 bg-white/6 backdrop-blur-xl"
-                        animate={{ x: [0, -16, 0], y: [0, 10, 0], scale: [1, 1.03, 1] }}
-                        transition={{ duration: 5, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                      >
-                        <div className="flex h-full w-full items-center justify-center text-[color:var(--accent)]">
-                          <LayoutGrid className="h-6 w-6" />
-                        </div>
-                      </motion.div>
-                      <motion.div
-                        aria-hidden
-                        className="absolute left-[40%] top-[42%] h-28 w-28 rounded-full border border-white/10 bg-[color:var(--accent)]/10 backdrop-blur-xl"
-                        animate={{ scale: [1, 1.08, 1], rotate: [0, 8, 0] }}
-                        transition={{ duration: 3.8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                      >
-                        <div className="flex h-full w-full items-center justify-center text-[color:var(--accent)]">
-                          <ScanSearch className="h-7 w-7" />
-                        </div>
-                      </motion.div>
-                      <motion.div
-                        aria-hidden
-                        className="absolute left-[20%] bottom-[18%] h-16 w-16 rounded-full border border-white/10 bg-white/6 backdrop-blur-xl"
-                        animate={{ x: [0, 22, 0], y: [0, -10, 0], scale: [1, 1.06, 1] }}
-                        transition={{ duration: 4.6, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                      >
-                        <div className="flex h-full w-full items-center justify-center text-[color:var(--accent)]">
-                          <ArrowRight className="h-5 w-5" />
-                        </div>
-                      </motion.div>
-                      <motion.div
-                        aria-hidden
-                        className="absolute right-[18%] bottom-[16%] h-20 w-20 rounded-full border border-white/10 bg-white/6 backdrop-blur-xl"
-                        animate={{ x: [0, -18, 0], y: [0, -12, 0], scale: [1, 1.05, 1] }}
-                        transition={{ duration: 4.4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                      >
-                        <div className="flex h-full w-full items-center justify-center text-[color:var(--accent)]">
-                          <Hammer className="h-5 w-5" />
-                        </div>
-                      </motion.div>
-
-                      <motion.div
-                        aria-hidden
-                        className="absolute inset-x-6 top-1/2 h-px -translate-y-1/2 bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.12),rgba(199,166,110,0.8),rgba(255,255,255,0.9),rgba(199,166,110,0.8),rgba(199,166,110,0.12),transparent)]"
-                        animate={{ opacity: [0.55, 1, 0.55] }}
-                        transition={{ duration: 2.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                      />
-
-                      <motion.div
-                        aria-hidden
-                        className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[color:var(--accent)] shadow-[0_0_24px_rgba(199,166,110,0.85)]"
-                        animate={{ x: [0, 80, 180, 300, 420, 0] }}
-                        transition={{
-                          duration: prefersReducedMotion ? 0 : 6.2,
-                          repeat: Number.POSITIVE_INFINITY,
-                          ease: "easeInOut",
-                        }}
-                        style={{ left: "10%" }}
-                      />
-
-                      <div className="absolute inset-x-5 bottom-5 flex items-center justify-between gap-4 rounded-[1.35rem] border border-white/10 bg-black/35 px-4 py-3 backdrop-blur-xl">
-                        <div>
-                          <p className="text-xs uppercase tracking-[0.3em] text-white/55">Now playing</p>
-                          <p className="mt-1 font-display text-2xl text-white">Handshake to reveal</p>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.28em] text-white/60">
-                          <span>01</span>
-                          <span>02</span>
-                          <span>03</span>
-                          <span>04</span>
-                          <span>05</span>
-                          <span>06</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[color:var(--muted)]">
-                      <span>Building the story</span>
-                      <span>{Math.round(loaderProgress)}%</span>
-                    </div>
-                    <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/8">
-                      <motion.div
-                        className="h-full rounded-full bg-[linear-gradient(90deg,#8f6c39,#d5b77a,#fff4d8,#d5b77a,#8f6c39)]"
-                        animate={{ width: `${loaderProgress}%` }}
-                        transition={{ duration: 0.55, ease: "easeOut" }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
 
       <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-[color:var(--border)] bg-[color:var(--background)]/55 px-4 py-3 shadow-[0_18px_60px_-30px_rgba(10,10,10,0.55)] backdrop-blur-2xl">
@@ -736,7 +410,6 @@ export function LuxurySite() {
               ["About", "about"],
               ["Services", "services"],
               ["Projects", "projects"],
-              ["Materials", "materials"],
               ["Contact", "contact"],
             ].map(([label, id]) => (
               <button
@@ -798,7 +471,6 @@ export function LuxurySite() {
                   ["About", "about"],
                   ["Services", "services"],
                   ["Projects", "projects"],
-                  ["Materials", "materials"],
                   ["Contact", "contact"],
                 ].map(([label, id]) => (
                   <button
@@ -820,12 +492,8 @@ export function LuxurySite() {
         </AnimatePresence>
       </header>
 
-      <main className={`relative transition-opacity duration-300 ${loaderVisible ? "opacity-0 pointer-events-none select-none" : "opacity-100"}`}>
+      <main className="relative">
         <section id="home" className="relative min-h-screen overflow-hidden pt-28 sm:pt-32">
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(199,166,110,0.24),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.12),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent_40%)]" />
-          <div className="absolute inset-x-0 top-0 -z-10 h-[78vh] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_40%),linear-gradient(135deg,rgba(16,13,10,0.96),rgba(24,20,16,0.94)_42%,rgba(10,10,10,0.96))] dark:block" />
-          <div className="absolute inset-0 -z-20 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),transparent_14%,transparent_82%,rgba(10,10,10,0.18))]" />
-
           <div className="mx-auto grid max-w-7xl gap-12 px-6 pb-20 pt-10 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-10 lg:pb-28 lg:pt-16">
             <div className="space-y-8">
               <div className="space-y-4">
@@ -870,11 +538,13 @@ export function LuxurySite() {
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {stats.map((item, index) => (
                   <Reveal key={item.label} delay={index * 0.08}>
-                    <Card className="h-full bg-white/4 p-5">
-                      <p className="font-display text-3xl text-[color:var(--foreground)]">
+                    <Card className="h-full min-h-[8.75rem] bg-white/4 p-4 sm:p-5">
+                      <p className="font-display text-2xl leading-none text-[color:var(--foreground)] sm:text-3xl">
                         {item.value}
                       </p>
-                      <p className="mt-2 text-sm text-[color:var(--muted)]">{item.label}</p>
+                      <p className="mt-3 max-w-[8.5rem] text-[0.68rem] leading-5 tracking-[0.2em] text-[color:var(--muted)] sm:text-xs sm:tracking-[0.24em]">
+                        {item.label}
+                      </p>
                     </Card>
                   </Reveal>
                 ))}
@@ -1216,43 +886,6 @@ export function LuxurySite() {
           </div>
         </section>
 
-        <section id="materials" className="py-10 sm:py-20">
-          <SectionShell
-            eyebrow="Raw Materials"
-            title="A polished supply showcase for contractors and builders."
-            description="Elegant product cards make it easy to browse core materials without turning the site into an ecommerce experience."
-          />
-
-          <div className="mx-auto mt-10 grid max-w-7xl gap-4 px-6 sm:px-8 md:grid-cols-2 xl:grid-cols-3 lg:px-10">
-            {materials.map((material, index) => {
-              const Icon = material.icon;
-              return (
-                <Reveal key={material.title} delay={index * 0.05}>
-                  <Card className="group overflow-hidden p-0 transition-all duration-500 hover:-translate-y-1 hover:border-[color:var(--accent)]/35">
-                    <div className={`h-40 bg-gradient-to-br ${material.accent}`} />
-                    <div className="relative p-5">
-                      <div className="absolute -top-8 right-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-[color:var(--background)]/85 text-[color:var(--accent)] shadow-[0_12px_30px_-18px_rgba(0,0,0,0.7)] backdrop-blur-xl">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <Badge>{material.tag}</Badge>
-                      <h3 className="mt-5 font-display text-3xl text-[color:var(--foreground)]">
-                        {material.title}
-                      </h3>
-                      <p className="mt-3 text-sm leading-7 text-[color:var(--muted)]">
-                        {material.description}
-                      </p>
-                      <Button variant="outline" size="sm" className="mt-6 w-full">
-                        Inquiry CTA
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </Card>
-                </Reveal>
-              );
-            })}
-          </div>
-        </section>
-
         <section className="py-10 sm:py-20">
           <SectionShell
             eyebrow="Process"
@@ -1263,11 +896,11 @@ export function LuxurySite() {
           <div className="mx-auto mt-10 max-w-7xl px-6 sm:px-8 lg:px-10">
             <Card className="overflow-hidden bg-white/[0.05] p-6 sm:p-8">
               <div className="relative grid gap-6 lg:grid-cols-6 lg:gap-0">
-                <div className="absolute left-[2.25rem] top-8 hidden h-[calc(100%-4rem)] w-px bg-[linear-gradient(180deg,rgba(255,255,255,0.18),rgba(199,166,110,0.8),rgba(255,255,255,0.18))] lg:block" />
+                <div className="absolute left-[2.25rem] top-8 block h-[calc(100%-4rem)] w-px bg-[linear-gradient(180deg,rgba(255,255,255,0.18),rgba(199,166,110,0.8),rgba(255,255,255,0.18))] lg:hidden" />
                 {processSteps.map((step, index) => (
                   <Reveal key={step.title} delay={index * 0.06}>
                     <motion.div
-                      className="relative pl-14 lg:pl-0"
+                      className="relative pl-14 lg:pl-0 lg:pt-2"
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, amount: 0.35 }}
@@ -1288,7 +921,7 @@ export function LuxurySite() {
                       </motion.div>
                       <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-white/5 p-5 transition-colors duration-300 lg:min-h-[15rem] hover:border-[color:var(--accent)]/30">
                         <motion.div
-                          className="mb-4 h-px w-full bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.85),transparent)]"
+                          className="mb-4 h-px w-full bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.85),transparent)] lg:hidden"
                           initial={{ scaleX: 0, opacity: 0 }}
                           whileInView={{ scaleX: 1, opacity: 1 }}
                           viewport={{ once: true, amount: 0.35 }}
@@ -1600,7 +1233,7 @@ export function LuxurySite() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
               ["Home", "About", "Services"],
-              ["Projects", "Materials", "Contact"],
+              ["Projects", "Contact"],
               ["Instagram", "LinkedIn", "WhatsApp"],
             ].map((group, index) => (
               <div key={String(index)} className="space-y-3">
