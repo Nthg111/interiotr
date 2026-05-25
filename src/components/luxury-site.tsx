@@ -4,6 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+declare global {
+  interface Window {
+    ScrollTrigger?: typeof ScrollTrigger;
+  }
+}
 import {
   AnimatePresence,
   motion,
@@ -353,7 +359,7 @@ export function LuxurySite() {
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const lenisRef = useRef<any>(null);
+  const lenisRef = useRef<InstanceType<typeof Lenis> | null>(null);
   const [activeProcessStep, setActiveProcessStep] = useState(0);
   const [processScrollProgress, setProcessScrollProgress] = useState(0);
   const processSectionRef = useRef<HTMLElement | null>(null);
@@ -397,9 +403,9 @@ export function LuxurySite() {
 
     let frame = 0;
     const raf = (time: number) => {
-      lenisRef.current.raf(time);
+      lenisRef.current!.raf(time);
       // ensure ScrollTrigger sees updates when Lenis animates
-      if ((window as any).ScrollTrigger) (window as any).ScrollTrigger.update();
+      if (window.ScrollTrigger) window.ScrollTrigger.update();
       frame = requestAnimationFrame(raf);
     };
 
@@ -410,7 +416,9 @@ export function LuxurySite() {
       cancelAnimationFrame(frame);
       try {
         lenisRef.current?.destroy();
-      } catch (e) {}
+      } catch {
+        // ignore
+      }
     };
   }, []);
 
@@ -432,7 +440,7 @@ export function LuxurySite() {
     if (!section || !viewport || !track) return;
 
     // If Lenis is active, wire ScrollTrigger to it so GSAP stays in sync with smooth scrolling
-    const lenis = (lenisRef as any).current;
+    const lenis = lenisRef.current;
     if (lenis) {
       try {
         ScrollTrigger.scrollerProxy(document.documentElement, {
@@ -454,7 +462,7 @@ export function LuxurySite() {
 
         // ensure ScrollTrigger updates when Lenis notifies
         if (typeof lenis.on === "function") lenis.on("scroll", () => ScrollTrigger.update());
-      } catch (e) {
+      } catch {
         // ignore scroller proxy errors
       }
     }
@@ -1036,7 +1044,7 @@ export function LuxurySite() {
           </div>
         </section>
 
-        <section ref={processSectionRef as any} className="relative h-screen">
+        <section ref={processSectionRef as React.RefObject<HTMLElement>} className="relative h-screen">
           <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
             <SectionShell
               eyebrow="Process"
@@ -1059,11 +1067,11 @@ export function LuxurySite() {
             </div>
 
             <div
-              ref={processViewportRef as any}
+              ref={processViewportRef as React.RefObject<HTMLDivElement>}
               className="relative z-10 mx-auto mt-12 h-full max-w-full overflow-hidden px-6"
             >
               <div
-                ref={processTrackRef as any}
+                ref={processTrackRef as React.RefObject<HTMLDivElement>}
                 className="flex h-full items-center gap-8 py-8"
               >
                 {processSteps.map((step, index) => {
