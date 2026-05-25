@@ -110,7 +110,7 @@ const services: Service[] = [
   {
     title: "Raw Material Supply",
     description:
-      "Trusted sourcing for contractors and builders across veneers, hardware, tiles, glass, and more.",
+      "Trusted sourcing for contractors and builders across veneers, tiles, glass, and more.",
     icon: Ruler,
   },
   {
@@ -197,13 +197,6 @@ const materials: Material[] = [
     tag: "Cladding",
     accent: "from-neutral-950 via-stone-700 to-neutral-500",
     icon: Boxes,
-  },
-  {
-    title: "Hardware",
-    description: "Soft-close, hinges, channels, and fittings selected for durable precision.",
-    tag: "Utility",
-    accent: "from-zinc-900 via-neutral-700 to-stone-500",
-    icon: ShieldCheck,
   },
   {
     title: "Glass",
@@ -298,7 +291,7 @@ const galleryItems: GalleryItem[] = [
   {
     title: "Chef Kitchen Detail",
     category: "Residential",
-    note: "Modular precision balanced with warm task lighting and seamless hardware.",
+    note: "Modular precision balanced with warm task lighting and seamless detailing.",
     accent: "from-neutral-950 via-stone-700 to-amber-800",
   },
   {
@@ -406,7 +399,6 @@ export function LuxurySite() {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [selectedGalleryFilter, setSelectedGalleryFilter] = useState<(typeof galleryFilters)[number]>("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [cursor, setCursor] = useState({ x: 0, y: 0 });
   const [split, setSplit] = useState(56);
   const { setTheme, resolvedTheme } = useTheme();
   const prefersReducedMotion = useReducedMotion();
@@ -465,12 +457,6 @@ export function LuxurySite() {
   }, []);
 
   useEffect(() => {
-    const onMove = (event: MouseEvent) => setCursor({ x: event.clientX, y: event.clientY });
-    window.addEventListener("mousemove", onMove);
-    return () => window.removeEventListener("mousemove", onMove);
-  }, []);
-
-  useEffect(() => {
     const heroLines = document.querySelectorAll("[data-hero-line]");
     gsap.fromTo(
       heroLines,
@@ -493,13 +479,6 @@ export function LuxurySite() {
         aria-hidden
         className="pointer-events-none fixed left-0 top-0 z-[60] h-1 origin-left bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.95),rgba(255,255,255,0.95),rgba(199,166,110,0.95),transparent)]"
         style={{ scaleX: progress }}
-      />
-
-      <motion.div
-        aria-hidden
-        className="pointer-events-none fixed z-[80] hidden h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[color:var(--accent)]/40 bg-[color:var(--accent)]/10 backdrop-blur-2xl xl:block"
-        animate={{ x: cursor.x, y: cursor.y }}
-        transition={{ type: "spring", stiffness: 180, damping: 22, mass: 0.2 }}
       />
 
       <AnimatePresence>
@@ -1104,11 +1083,34 @@ export function LuxurySite() {
                 <div className="absolute left-[2.25rem] top-8 hidden h-[calc(100%-4rem)] w-px bg-[linear-gradient(180deg,rgba(255,255,255,0.18),rgba(199,166,110,0.8),rgba(255,255,255,0.18))] lg:block" />
                 {processSteps.map((step, index) => (
                   <Reveal key={step.title} delay={index * 0.06}>
-                    <div className="relative pl-14 lg:pl-0">
-                      <div className="absolute left-0 top-1 flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--background)] text-xs font-semibold text-[color:var(--accent)] lg:top-0 lg:-translate-x-1/2">
+                    <motion.div
+                      className="relative pl-14 lg:pl-0"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.35 }}
+                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: index * 0.06 }}
+                      whileHover={{ y: -4 }}
+                    >
+                      <motion.div
+                        className="absolute left-0 top-1 flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--background)] text-xs font-semibold text-[color:var(--accent)] lg:top-0 lg:-translate-x-1/2"
+                        animate={{ scale: [1, 1.04, 1] }}
+                        transition={{
+                          duration: 5,
+                          repeat: Number.POSITIVE_INFINITY,
+                          ease: "easeInOut",
+                          delay: index * 0.15,
+                        }}
+                      >
                         {String(index + 1).padStart(2, "0")}
-                      </div>
-                      <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-white/5 p-5 lg:min-h-[15rem]">
+                      </motion.div>
+                      <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-white/5 p-5 transition-colors duration-300 lg:min-h-[15rem] hover:border-[color:var(--accent)]/30">
+                        <motion.div
+                          className="mb-4 h-px w-full bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.85),transparent)]"
+                          initial={{ scaleX: 0, opacity: 0 }}
+                          whileInView={{ scaleX: 1, opacity: 1 }}
+                          viewport={{ once: true, amount: 0.35 }}
+                          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: index * 0.06 + 0.1 }}
+                        />
                         <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--muted)]">
                           Step
                         </p>
@@ -1119,7 +1121,7 @@ export function LuxurySite() {
                           {step.description}
                         </p>
                       </div>
-                    </div>
+                    </motion.div>
                   </Reveal>
                 ))}
               </div>
