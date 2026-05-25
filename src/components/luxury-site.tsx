@@ -535,7 +535,7 @@ export function LuxurySite() {
         ease: "power4.out",
       },
     );
-  }, []);
+  }, [loaderVisible]);
 
   const themeIsDark = resolvedTheme ? resolvedTheme === "dark" : true;
 
@@ -555,104 +555,183 @@ export function LuxurySite() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.8, ease: "easeOut" } }}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(199,166,110,0.18),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent)]" />
-            <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.2),rgba(199,166,110,0.8),rgba(199,166,110,0.2),transparent)]" />
-            <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center gap-8 px-6 text-center">
-              <motion.div
-                className="flex flex-col items-center gap-4"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="flex h-24 w-24 items-center justify-center rounded-full border border-[color:var(--border)] bg-white/5 text-2xl font-semibold tracking-[0.35em] text-[color:var(--accent)] backdrop-blur-xl">
-                  ITA
-                </div>
-                <div className="space-y-2">
-                  <p className="text-xs uppercase tracking-[0.4em] text-[color:var(--muted)]">
-                    Construction intro sequence
-                  </p>
-                  <h1 className="font-display text-4xl leading-none text-[color:var(--foreground)] sm:text-6xl">
-                    From brief to handover
-                  </h1>
-                </div>
-              </motion.div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(199,166,110,0.18),transparent_36%),radial-gradient(circle_at_75%_35%,rgba(255,255,255,0.1),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent)]" />
+            <motion.div
+              aria-hidden
+              className="absolute left-[-8rem] top-[-6rem] h-[26rem] w-[26rem] rounded-full bg-[color:var(--accent)]/10 blur-3xl"
+              animate={{ scale: [1, 1.12, 1], x: [0, 24, 0], y: [0, 16, 0] }}
+              transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+            />
+            <motion.div
+              aria-hidden
+              className="absolute bottom-[-8rem] right-[-4rem] h-[30rem] w-[30rem] rounded-full bg-white/5 blur-3xl"
+              animate={{ scale: [1, 0.92, 1], x: [0, -20, 0], y: [0, -14, 0] }}
+              transition={{ duration: 12, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+            />
 
-              <AnimatePresence mode="wait">
+            <div className="relative mx-auto w-full max-w-7xl px-6">
+              <div className="grid items-center gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:gap-12">
                 <motion.div
-                  key={introScenes[introPhase].title}
-                  className="w-full max-w-3xl"
-                  initial={{ opacity: 0, y: 18, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -12, scale: 0.98 }}
-                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="space-y-6 text-center lg:text-left"
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <div className="grid gap-4 rounded-[2rem] border border-[color:var(--border)] bg-white/5 p-5 shadow-[0_28px_90px_-55px_rgba(0,0,0,0.8)] backdrop-blur-2xl sm:p-6 md:grid-cols-[0.95fr_1.05fr] md:items-center md:p-7">
-                    <div className={`rounded-[1.75rem] bg-gradient-to-br ${introScenes[introPhase].accent} p-6 text-left`}>
-                      <div className="flex items-center justify-between text-xs uppercase tracking-[0.32em] text-white/65">
-                        <span>{introScenes[introPhase].badge}</span>
-                        <span>{String(introPhase + 1).padStart(2, "0")}</span>
+                  <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full border border-[color:var(--border)] bg-white/5 text-2xl font-semibold tracking-[0.35em] text-[color:var(--accent)] backdrop-blur-xl lg:mx-0">
+                    ITA
+                  </div>
+                  <div className="space-y-3">
+                    <p className="text-xs uppercase tracking-[0.42em] text-[color:var(--muted)]">
+                      Construction motion intro
+                    </p>
+                    <h1 className="font-display text-4xl leading-none text-[color:var(--foreground)] sm:text-6xl lg:text-[4.4rem]">
+                      From brief to handover
+                    </h1>
+                    <p className="mx-auto max-w-xl text-sm leading-7 text-[color:var(--muted)] lg:mx-0 sm:text-base">
+                      Handshake, blueprint, site movement, tools, materials, and final reveal in one
+                      short cinematic sequence before the page enters.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+                    {[
+                      "Handshake",
+                      "Blueprint",
+                      "Site move",
+                      "Tools + materials",
+                      "Final reveal",
+                    ].map((label, index) => (
+                      <motion.span
+                        key={label}
+                        className="rounded-full border border-[color:var(--border)] bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.28em] text-[color:var(--foreground)]/85 backdrop-blur-xl"
+                        animate={{ y: [0, -4, 0], opacity: [0.82, 1, 0.82] }}
+                        transition={{
+                          duration: 3.2,
+                          repeat: Number.POSITIVE_INFINITY,
+                          ease: "easeInOut",
+                          delay: index * 0.18,
+                        }}
+                      >
+                        {label}
+                      </motion.span>
+                    ))}
+                  </div>
+                </motion.div>
+
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-[2.5rem] bg-[radial-gradient(circle_at_20%_20%,rgba(199,166,110,0.16),transparent_30%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.08),transparent_24%)] blur-2xl" />
+                  <div className="relative overflow-hidden rounded-[2.25rem] border border-[color:var(--border)] bg-white/5 p-5 shadow-[0_30px_100px_-60px_rgba(0,0,0,0.9)] backdrop-blur-2xl sm:p-6">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.34em] text-[color:var(--muted)]">
+                          Intro sequence
+                        </p>
+                        <p className="mt-2 font-display text-2xl text-[color:var(--foreground)]">
+                          Motion roadmap for a build story.
+                        </p>
                       </div>
-                      <div className="mt-8 flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-black/20 text-white shadow-[0_18px_40px_-24px_rgba(0,0,0,0.75)]">
-                        {(() => {
-                          const SceneIcon = introScenes[introPhase].icon;
-                          return <SceneIcon className="h-10 w-10" />;
-                        })()}
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--border)] bg-black/20 text-[color:var(--accent)]">
+                        <SlidersHorizontal className="h-5 w-5" />
                       </div>
-                      <p className="mt-6 max-w-sm text-sm leading-7 text-white/75">
-                        {introScenes[introPhase].subtitle}
-                      </p>
                     </div>
 
-                    <div className="space-y-5 text-left">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.35em] text-[color:var(--muted)]">
-                          Scene {String(introPhase + 1).padStart(2, "0")}
-                        </p>
-                        <h2 className="mt-3 font-display text-3xl leading-tight text-[color:var(--foreground)] sm:text-4xl">
-                          {introScenes[introPhase].title}
-                        </h2>
-                      </div>
-
-                      <p className="max-w-xl text-sm leading-7 text-[color:var(--muted)] sm:text-base">
-                        {introScenes[introPhase].subtitle}
-                      </p>
-
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[color:var(--muted)]">
-                          <span>Building the story</span>
-                          <span>{Math.round(loaderProgress)}%</span>
-                        </div>
-                        <div className="h-1 overflow-hidden rounded-full bg-white/8">
+                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                      {introScenes.map((scene, index) => {
+                        const SceneIcon = scene.icon;
+                        const isActive = index === introPhase;
+                        return (
                           <motion.div
-                            className="h-full rounded-full bg-[linear-gradient(90deg,#8f6c39,#d5b77a,#fff4d8,#d5b77a,#8f6c39)]"
-                            animate={{ width: `${loaderProgress}%` }}
-                            transition={{ duration: 0.55, ease: "easeOut" }}
-                          />
-                        </div>
-                      </div>
+                            key={scene.title}
+                            className={`rounded-[1.5rem] border p-4 text-left shadow-[0_20px_40px_-30px_rgba(0,0,0,0.7)] ${
+                              isActive
+                                ? "border-[color:var(--accent)]/45 bg-[color:var(--accent)]/12"
+                                : "border-[color:var(--border)] bg-white/5"
+                            }`}
+                            animate={{
+                              y: isActive ? [0, -6, 0] : [0, -2, 0],
+                              scale: isActive ? [1, 1.03, 1] : [1, 1, 1],
+                            }}
+                            transition={{
+                              duration: isActive ? 2.4 : 3.6,
+                              repeat: Number.POSITIVE_INFINITY,
+                              ease: "easeInOut",
+                              delay: index * 0.14,
+                            }}
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex items-center gap-3">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-black/20 text-[color:var(--accent)]">
+                                  <SceneIcon className="h-5 w-5" />
+                                </div>
+                                <div>
+                                  <p className="text-[0.65rem] uppercase tracking-[0.3em] text-[color:var(--muted)]">
+                                    {scene.badge}
+                                  </p>
+                                  <h2 className="mt-2 font-display text-xl text-[color:var(--foreground)]">
+                                    {scene.title}
+                                  </h2>
+                                </div>
+                              </div>
+                              <span className="text-xs uppercase tracking-[0.3em] text-[color:var(--muted)]">
+                                {String(index + 1).padStart(2, "0")}
+                              </span>
+                            </div>
+                            <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">
+                              {scene.subtitle}
+                            </p>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
 
-                      <div className="grid gap-2 sm:grid-cols-3">
+                    <div className="mt-6 rounded-[1.5rem] border border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-4">
+                      <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[color:var(--muted)]">
+                        <span>Sequence progress</span>
+                        <span>{Math.round(loaderProgress)}%</span>
+                      </div>
+                      <div className="relative mt-4 h-20 overflow-hidden rounded-full border border-white/8 bg-black/20">
+                        <div className="absolute inset-x-5 top-1/2 h-px -translate-y-1/2 bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.25),rgba(199,166,110,0.8),rgba(199,166,110,0.25),transparent)]" />
                         {introScenes.map((scene, index) => {
+                          const position = `${8 + index * 18}%`;
+                          const SceneIcon = scene.icon;
                           const isActive = index === introPhase;
                           return (
-                            <div
+                            <motion.div
                               key={scene.title}
-                              className={`rounded-2xl border px-3 py-3 text-left transition-all duration-300 ${
+                              className={`absolute top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border text-white shadow-[0_16px_30px_-20px_rgba(0,0,0,0.75)] ${
                                 isActive
-                                  ? "border-[color:var(--accent)]/55 bg-[color:var(--accent)]/12 text-[color:var(--foreground)]"
-                                  : "border-[color:var(--border)] bg-white/5 text-[color:var(--muted)]"
+                                  ? "border-[color:var(--accent)]/70 bg-[color:var(--accent)]/22"
+                                  : "border-white/10 bg-black/30"
                               }`}
+                              style={{ left: position }}
+                              animate={{ y: [0, -5, 0], scale: isActive ? [1, 1.12, 1] : [1, 1, 1] }}
+                              transition={{
+                                duration: 2.8,
+                                repeat: Number.POSITIVE_INFINITY,
+                                ease: "easeInOut",
+                                delay: index * 0.16,
+                              }}
                             >
-                              <p className="text-[0.65rem] uppercase tracking-[0.28em]">{scene.badge}</p>
-                              <p className="mt-2 text-sm leading-6">{scene.title}</p>
-                            </div>
+                              <SceneIcon className="h-4 w-4" />
+                            </motion.div>
                           );
                         })}
+
+                        <motion.div
+                          className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[color:var(--accent)] shadow-[0_0_24px_rgba(199,166,110,0.85)]"
+                          animate={{ x: [0, 140, 280, 420, 560, 0] }}
+                          transition={{
+                            duration: prefersReducedMotion ? 0 : 6.5,
+                            repeat: Number.POSITIVE_INFINITY,
+                            ease: "easeInOut",
+                          }}
+                          style={{ left: "8%" }}
+                        />
                       </div>
                     </div>
                   </div>
-                </motion.div>
-              </AnimatePresence>
+                </div>
+              </div>
             </div>
           </motion.div>
         ) : null}
