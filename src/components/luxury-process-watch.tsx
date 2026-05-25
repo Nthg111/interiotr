@@ -217,7 +217,7 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
                       onMouseLeave={() => handleHover(null)}
                       onBlur={() => handleHover(null)}
                       onClick={() => onOpen?.(i)}
-                      className={`rounded-full transition-transform duration-200 ease-[cubic-bezier(.22,1,.36,1)] ${isActive ? 'scale-125 bg-[rgba(199,166,110,0.95)] shadow-[0_10px_30px_-10px_rgba(199,166,110,0.25)]' : 'bg-white/8'}`}
+                      className={`rounded-full transition-transform duration-200 ease-[cubic-bezier(.22,1,.36,1)] focus:outline-none focus-visible:ring-0 ${isActive ? 'scale-125 bg-[rgba(199,166,110,0.95)] shadow-[0_10px_30px_-10px_rgba(199,166,110,0.25)]' : 'bg-white/8'}`}
                       style={{ width: isActive ? 14 : 8, height: isActive ? 14 : 8 }}
                     />
                     {isActive ? (
