@@ -444,15 +444,15 @@ export function LuxurySite() {
     if (lenis) {
       try {
         ScrollTrigger.scrollerProxy(document.documentElement, {
-          scrollTop(value: number) {
-            if (arguments.length) {
+          scrollTop(value?: number) {
+            if (arguments.length && typeof value === "number") {
               // scrollTo with zero duration to immediately set when requested
               if (typeof lenis.scrollTo === "function") lenis.scrollTo(value, { duration: 0 });
-              else if (typeof lenis.scroll === "object" && lenis.scroll.set) lenis.scroll.set(value);
+              else if (typeof lenis.scroll === "object" && (lenis.scroll as any).set) (lenis.scroll as any).set(value);
               return;
             }
             // try to return current Lenis scroll position, fallback to window
-            return (lenis && lenis.scroll && (lenis.scroll.instance?.scroll?.y ?? lenis.scroll.y)) || window.scrollY;
+            return (lenis && (lenis.scroll as any) && ((lenis.scroll as any).instance?.scroll?.y ?? (lenis.scroll as any).y)) || window.scrollY;
           },
           getBoundingClientRect() {
             return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
