@@ -26,16 +26,9 @@ The static site is emitted to the `out/` folder.
 
 ## Folder Structure
 
-- `src/app` - application shell, global styles, loading and transition files
-- `src/components` - reusable UI blocks and the luxury homepage
-- `src/lib` - shared utilities
-- `public` - static assets
 
 ## Notes
 
-- The project is intentionally frontend-only.
-- Motion, filters, lightbox, theme toggle, and loading states are all client-side.
-- Replace placeholder contact details and imagery when final brand assets are available.
 
 ## Deploy
 
@@ -75,4 +68,5 @@ npm run dev
 npm run build
 npm run export
 ```
+ - debug: local commit marker (you can commit this change)
 
