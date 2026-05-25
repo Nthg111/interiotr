@@ -544,7 +544,7 @@ export function LuxurySite() {
                       <p className="font-display text-2xl leading-none text-[color:var(--foreground)] sm:text-3xl">
                         {item.value}
                       </p>
-                      <p className="mt-3 max-w-[8.5rem] text-[0.68rem] leading-5 tracking-[0.2em] text-[color:var(--muted)] sm:text-xs sm:tracking-[0.24em]">
+                      <p className="mt-3 max-w-[8.5rem] text-balance break-words text-[0.64rem] leading-4 tracking-[0.14em] text-[color:var(--muted)] sm:text-[0.72rem] sm:leading-5 sm:tracking-[0.2em]">
                         {item.label}
                       </p>
                     </Card>
