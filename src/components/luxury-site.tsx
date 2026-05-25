@@ -344,6 +344,16 @@ export function LuxurySite() {
   useEffect(() => {
     const mountFrame = requestAnimationFrame(() => setMounted(true));
 
+    // Temporarily disable Lenis smooth-scrolling to debug a "stuck" process section.
+    // Set `enableLenis` to true to re-enable smooth scrolling when debugging is complete.
+    const enableLenis = false;
+
+    if (!enableLenis) {
+      return () => {
+        cancelAnimationFrame(mountFrame);
+      };
+    }
+
     const lenis = new Lenis({
       duration: 1.1,
       easing: (t) => 1 - Math.pow(1 - t, 3),
@@ -375,6 +385,9 @@ export function LuxurySite() {
 
   const themeIsDark = resolvedTheme ? resolvedTheme === "dark" : true;
 
+  // debugDisableOverlays: when true, make fixed overlays non-interactive to test scroll blocking.
+  const debugDisableOverlays = true;
+
   return (
     <div className="relative isolate overflow-hidden bg-[color:var(--background)]">
       <div
@@ -383,12 +396,19 @@ export function LuxurySite() {
       />
       <motion.div
         aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[60] h-1 origin-left bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.95),rgba(255,255,255,0.95),rgba(199,166,110,0.95),transparent)]"
+        className={`pointer-events-none fixed left-0 top-0 z-[60] h-1 origin-left bg-[linear-gradient(90deg,transparent,rgba(199,166,110,0.95),rgba(255,255,255,0.95),rgba(199,166,110,0.95),transparent)] ${
+          debugDisableOverlays ? "pointer-events-none" : ""
+        }`}
         style={{ scaleX: progress }}
       />
 
 
-      <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8">
+      <header
+        className={`fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8 ${
+          debugDisableOverlays ? "pointer-events-none" : ""
+        }`}
+        aria-hidden={debugDisableOverlays}
+      >
         <div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-[color:var(--border)] bg-[color:var(--background)]/55 px-4 py-3 shadow-[0_18px_60px_-30px_rgba(10,10,10,0.55)] backdrop-blur-2xl">
           <button
             type="button"
