@@ -1107,17 +1107,21 @@ export function LuxurySite() {
                         style={{ width: `${split}%` }}
                       >
                         <div className="absolute inset-0 bg-[linear-gradient(145deg,rgba(35,27,20,0.96),rgba(145,118,74,0.82)),radial-gradient(circle_at_top,rgba(255,255,255,0.15),transparent_30%)]" />
-                        <div className="absolute inset-0 flex items-end p-5 text-white">
-                          <div>
+                        <div className="absolute inset-x-0 bottom-0 flex items-end p-5 text-white">
+                          <div className="max-w-[12rem]">
                             <p className="text-xs uppercase tracking-[0.3em] text-white/55">Before</p>
-                            <p className="mt-2 font-display text-2xl">Raw shell with potential</p>
+                            <p className="mt-2 font-display text-xl leading-tight sm:text-2xl">
+                              Raw shell with potential
+                            </p>
                           </div>
                         </div>
                       </div>
-                      <div className="absolute inset-0 flex items-end p-5 text-white">
-                        <div>
+                      <div className="absolute inset-0 flex items-end justify-end p-5 text-white">
+                        <div className="max-w-[12rem] text-right">
                           <p className="text-xs uppercase tracking-[0.3em] text-white/55">After</p>
-                          <p className="mt-2 font-display text-2xl">Polished luxury finish</p>
+                          <p className="mt-2 font-display text-xl leading-tight sm:text-2xl">
+                            Polished luxury finish
+                          </p>
                         </div>
                       </div>
                       <div
