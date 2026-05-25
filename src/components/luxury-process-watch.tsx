@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Quote, Ruler, Hammer, Boxes } from "lucide-react";
 import gsap from "gsap";
 import { motion, useReducedMotion } from "framer-motion";
 
@@ -140,26 +141,16 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
                       <circle cx={0} cy={0} r={10} fill="#0b0b0b" stroke="#ffffff08" />
                       {/* simple icon placeholders */}
                       {idx === 0 && (
-                        <g transform="translate(-4,-2) scale(0.7)" fill="#c7a66e">
-                          <rect x={-6} y={-4} width={12} height={8} rx={2} />
-                          <path d="M-2,6 L2,6 L0,9 Z" />
-                        </g>
+                        <Quote size={18} color="#c7a66e" />
                       )}
                       {idx === 1 && (
-                        <g transform="translate(-1,-1) scale(0.9)" stroke="#c7a66e" strokeWidth={1.2} fill="none">
-                          <path d="M-6,6 L6,-6" />
-                          <path d="M-2,4 L4,-6" />
-                        </g>
+                        <Ruler size={18} color="#c7a66e" />
                       )}
                       {idx === 2 && (
-                        <g transform="translate(-1,0) scale(0.8)" fill="#c7a66e">
-                          <rect x={-6} y={-2} width={12} height={6} rx={2} />
-                        </g>
+                        <Hammer size={18} color="#c7a66e" />
                       )}
                       {idx === 3 && (
-                        <g transform="translate(-2,-1) scale(0.8)" fill="#c7a66e">
-                          <rect x={-5} y={-4} width={10} height={8} rx={1} />
-                        </g>
+                        <Boxes size={18} color="#c7a66e" />
                       )}
                     </g>
                     <text x={0} y={44} fill="#c7a66e" fontSize={10} fontFamily="serif" textAnchor="middle">{label}</text>
