@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --background: 12 11 10;
+  --foreground: 244 240 234;
+  --surface: 24 22 20;
+  --surface-2: 34 30 25;
+  --muted: 174 164 151;
+  --border: 255 255 255 / 0.1;
+  --accent: 199 166 110;
+  --accent-foreground: 16 13 10;
+}
+
+.light {
+  color-scheme: light;
+  --background: 247 242 236;
+  --foreground: 21 18 16;
+  --surface: 255 252 248;
+  --surface-2: 238 231 222;
+  --muted: 111 99 88;
+  --border: 18 16 14 / 0.12;
+  --accent: 164 123 58;
+  --accent-foreground: 255 248 240;
+}
+
+@theme inline {
+  --color-background: rgb(var(--background));
+  --color-foreground: rgb(var(--foreground));
+  --color-surface: rgb(var(--surface));
+  --color-surface-2: rgb(var(--surface-2));
+  --color-muted: rgb(var(--muted));
+  --color-border: rgb(var(--border));
+  --color-accent: rgb(var(--accent));
+  --color-accent-foreground: rgb(var(--accent-foreground));
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-cormorant);
+}
+
+* {
+  border-color: rgb(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+  background:
+    radial-gradient(circle at top, rgba(199, 166, 110, 0.08), transparent 28%),
+    linear-gradient(180deg, rgb(var(--background)), rgb(var(--background)));
+}
+
+body {
+  min-height: 100vh;
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+  font-family: var(--font-manrope), sans-serif;
+}
+
+::selection {
+  background: rgba(199, 166, 110, 0.35);
+  color: rgb(var(--foreground));
+}
+
+.font-display {
+  font-family: var(--font-cormorant), serif;
+}
