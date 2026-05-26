@@ -38,6 +38,14 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
   const allSteps = useMemo(() => MICRO_STEPS, []);
   const [activeMajor, setActiveMajor] = useState<number | null>(null);
   const [activeDetail, setActiveDetail] = useState<string | null>(null);
+  const [view, setView] = useState<'dashboard' | 'detail'>('dashboard');
+
+  const MAJORS = [
+    { key: 'Consultation', detail: majorInfo[0].detail },
+    { key: 'Design', detail: majorInfo[1].detail },
+    { key: 'Execution', detail: majorInfo[2].detail },
+    { key: 'Delivery', detail: majorInfo[3].detail },
+  ];
 
   const majorInfo = [
     { title: 'Consultation', detail: 'We start with you — understanding needs, preferences, and the essence of your space.' },
@@ -65,6 +73,9 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
             tl.fromTo(sweepRef.current, { opacity: 0, x: -380 }, { opacity: 0.7, x: 380, duration: 1.4, ease: 'power3.out' }, 0.05);
             gsap.to(sweepRef.current, { x: -380, delay: 1.8, repeat: -1, duration: 5.2, ease: 'sine.inOut' });
           }
+          // ensure hands group has correct transform origin for rotations
+          if (handsGroupRef.current) gsap.set(handsGroupRef.current, { transformOrigin: '380px 380px' });
+          if (ringInnerRef.current) gsap.set(ringInnerRef.current, { transformOrigin: '380px 380px' });
           obs.disconnect();
         }
       }
@@ -100,6 +111,24 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeMicro]);
+
+  // navigate to detail view for a major quadrant
+  const openMajorDetail = (idx: number) => {
+    setActiveMajor(idx);
+    setActiveDetail(MAJORS[idx].detail);
+    setView('detail');
+    const midAngle = ((idx + 0.5) / 4) * 360 - 90; // center of quadrant
+    if (!prefersReduced && handsGroupRef.current) {
+      gsap.to(handsGroupRef.current, { rotation: midAngle, duration: 1.0, ease: 'power3.out' });
+    }
+  };
+
+  const closeDetail = () => {
+    setView('dashboard');
+    setActiveMajor(null);
+    setActiveDetail(null);
+    if (!prefersReduced && handsGroupRef.current) gsap.to(handsGroupRef.current, { rotation: 0, duration: 0.9, ease: 'power3.out' });
+  };
 
   return (
     <div ref={containerRef} className="w-full flex items-center justify-center" style={{ fontFamily: "Cinzel, 'Playfair Display', Georgia, serif" }}>
@@ -166,8 +195,8 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
                 })}
               </g>
 
-              {/* quadrant arcs for the 4 major process segments */}
-              {['Consultation','Design','Execution','Delivery'].map((label, idx) => {
+              {/* quadrant arcs for the 4 major process segments (clickable) */}
+              {MAJORS.map((m, idx) => {
                 const start = (idx / 4) * Math.PI * 2 - Math.PI / 2;
                 const end = ((idx + 1) / 4) * Math.PI * 2 - Math.PI / 2;
                 const r = 220;
@@ -177,8 +206,16 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
                 const y2 = 380 + Math.sin(end) * r;
                 const large = 0;
                 const path = `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`;
+                // label position (midpoint)
+                const mid = (start + end) / 2;
+                const labelR = 240;
+                const lx = 380 + Math.cos(mid) * labelR;
+                const ly = 380 + Math.sin(mid) * labelR;
                 return (
-                  <path key={label} d={path} className="lux-quad" stroke="#c7a66e22" strokeWidth={8} fill="none" opacity={0.45} strokeLinecap="round" />
+                  <g key={m.key} className="lux-quad-group" onClick={() => openMajorDetail(idx)} style={{ cursor: 'pointer' }}>
+                    <path d={path} className="lux-quad" stroke="#c7a66e22" strokeWidth={8} fill="none" opacity={0.45} strokeLinecap="round" />
+                    <text x={lx} y={ly + (idx === 0 ? -6 : 6)} fontSize={14} fontFamily="Cinzel, Playfair Display, serif" fill="#c7a66e" textAnchor="middle" alignmentBaseline="middle" style={{ pointerEvents: 'none', letterSpacing: '0.06em' }}>{m.key.toUpperCase()}</text>
+                  </g>
                 );
               })}
 
@@ -222,23 +259,39 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
 
             </svg>
 
-            {/* center detail circle: show active major info here (HTML overlay) */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-              <div className="w-[260px] h-[140px] flex items-center justify-center">
-                {activeDetail ? (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pointer-events-none text-center px-3">
-                    <p className="text-sm text-[color:var(--muted)]">{activeDetail}</p>
-                  </motion.div>
-                ) : activeMajor !== null ? (
-                  <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="pointer-events-none text-center px-3">
-                    <p className="text-sm text-[color:var(--muted)]">{majorInfo[activeMajor].title}</p>
-                    <p className="mt-2 text-xs text-[color:var(--muted)] max-w-[260px]">{majorInfo[activeMajor].detail}</p>
-                  </motion.div>
-                ) : (
-                  <div className="w-full h-full" />
-                )}
+            {/* center/detail overlay — switches between dashboard and detail views */}
+            {view === 'dashboard' ? (
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                <div className="w-[260px] h-[140px] flex items-center justify-center">
+                  {activeDetail ? (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pointer-events-none text-center px-3">
+                      <p className="text-sm text-[color:var(--muted)]">{activeDetail}</p>
+                    </motion.div>
+                  ) : activeMajor !== null ? (
+                    <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="pointer-events-none text-center px-3">
+                      <p className="text-sm text-[color:var(--muted)]">{majorInfo[activeMajor].title}</p>
+                      <p className="mt-2 text-xs text-[color:var(--muted)] max-w-[260px]">{majorInfo[activeMajor].detail}</p>
+                    </motion.div>
+                  ) : (
+                    <div className="w-full h-full" />
+                  )}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-auto">
+                <div className="bg-black/85 p-8 rounded-2xl max-w-[760px] mx-4 text-white">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h2 className="text-2xl font-serif tracking-wider">{activeMajor !== null ? MAJORS[activeMajor].key : 'DETAIL'}</h2>
+                      <p className="mt-3 text-sm text-white/80 max-w-[520px]">{activeMajor !== null ? MAJORS[activeMajor].detail : 'Select a stage to view details.'}</p>
+                    </div>
+                    <div>
+                      <button onClick={closeDetail} className="ml-4 text-sm text-white/70 hover:text-white">Back</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* interactive micro markers overlay for hover/click */}
