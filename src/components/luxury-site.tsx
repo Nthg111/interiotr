@@ -48,7 +48,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import LuxuryProcessWatch from "./luxury-process-watch";
 
 type IconComponent = React.ComponentType<{ className?: string }>;
 
@@ -72,14 +71,6 @@ type GalleryItem = {
   category: "Residential" | "Commercial" | "Materials";
   note: string;
   accent: string;
-};
-
-type ProcessStep = {
-  title: string;
-  description: string;
-  material: string;
-  detail: string;
-  texture: string;
 };
 
 const services: Service[] = [
@@ -236,339 +227,7 @@ const stats = [
   { value: "9", label: "Material Categories" },
   { value: "360°", label: "Design to Handover" },
 ];
-
-const circularProcessSteps: ProcessStep[] = [
-  { title: "Consultation", description: "Initial client meetings and brief definition.", material: "Brief", detail: "Client goals, scope, and budget.", texture: "" },
-  { title: "Design", description: "Concepts, moodboards and layout development.", material: "Concept", detail: "Schematics, finishes, and approvals.", texture: "" },
-  { title: "Selection", description: "Material selection and procurement planning.", material: "Materials", detail: "Samples, sourcing, and lead times.", texture: "" },
-  { title: "Documentation", description: "Construction drawings and shop drawings.", material: "Docs", detail: "Coordination packages for trades.", texture: "" },
-  { title: "Execution", description: "Site management, fabrication, and installation.", material: "Site", detail: "On-site supervision and QA.", texture: "" },
-  { title: "Handover", description: "Quality check and final client handover.", material: "Handover", detail: "Punchlist, training, and warranties.", texture: "" },
-];
-
-function CircularProcess({
-  steps,
-  onOpen,
-  onActiveChange,
-}: {
-  steps: ProcessStep[];
-  onOpen: (i: number) => void;
-  onActiveChange?: (i: number) => void;
-}) {
-  const prefersReducedMotion = useReducedMotion();
-  const [active, setActive] = useState(0);
-  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [initialSpin, setInitialSpin] = useState(false);
-
-  // Decide main 4 indices (clock points) and remainder mini steps
-  const mainIndices = [0, 1, 4, 5];
-  const miniIndices = steps.map((_, i) => i).filter((i) => !mainIndices.includes(i));
-
-  const getNearestMain = (idx: number) => {
-    // pick the main index with smallest circular distance
-    const len = steps.length;
-    let best = mainIndices[0];
-    let bestDist = Infinity;
-    for (const mi of mainIndices) {
-      const d = Math.min(Math.abs(mi - idx), len - Math.abs(mi - idx));
-      if (d < bestDist) {
-        bestDist = d;
-        best = mi;
-      }
-    }
-    return best;
-  };
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const onKey = (e: KeyboardEvent) => {
-      const len = steps.length;
-      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-        setActive((a) => (a + 1) % len);
-        e.preventDefault();
-      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-        setActive((a) => (a - 1 + len) % len);
-        e.preventDefault();
-      } else if (e.key === "Enter" || e.key === " ") {
-        onOpen(active);
-        e.preventDefault();
-      }
-    };
-    el.addEventListener("keydown", onKey);
-    return () => el.removeEventListener("keydown", onKey);
-  }, [steps.length, onOpen, active]);
-
-  useEffect(() => {
-    if (prefersReducedMotion) return;
-    try {
-      const seen = localStorage.getItem("process_seen_v1");
-      if (!seen) {
-        setInitialSpin(true);
-        // clear flag after short delay so spin can run only once
-        setTimeout(() => {
-          setInitialSpin(false);
-          localStorage.setItem("process_seen_v1", "1");
-        }, 2200);
-      }
-    } catch {
-      // ignore localStorage errors
-    }
-  }, [prefersReducedMotion]);
-
-  const handleMove = (e: React.MouseEvent) => {
-    if (!ref.current || prefersReducedMotion) return;
-    const rect = ref.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({ rx: -(y * 6), ry: x * 6 });
-  };
-
-  const handleLeave = () => {
-    if (prefersReducedMotion) return;
-    setTilt({ rx: 0, ry: 0 });
-  };
-
-  const radius = 140; // visual radius in px
-
-  return (
-    <div
-      ref={ref}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      className="relative flex w-full items-center justify-center"
-      style={{ perspective: 900 }}
-      tabIndex={0}
-      role="group"
-      aria-label="Process circular navigation"
-    >
-      <motion.div
-        className="relative flex h-[360px] w-[360px] items-center justify-center rounded-full"
-        style={{ transformStyle: "preserve-3d", willChange: "transform" }}
-        animate={
-          prefersReducedMotion
-            ? {}
-            : initialSpin
-            ? { rotateZ: [0, 720, 0], rotateX: tilt.rx, rotateY: tilt.ry }
-            : { rotateX: tilt.rx, rotateY: tilt.ry }
-        }
-        transition={initialSpin ? { duration: 1.9, ease: "easeInOut" } : { type: "spring", stiffness: 90, damping: 18 }}
-      >
-        {/* decorative depth */}
-        <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.03),transparent),linear-gradient(180deg,rgba(0,0,0,0.55),rgba(0,0,0,0.75))] shadow-[0_20px_80px_-30px_rgba(0,0,0,0.9)]" />
-
-        {/* tick marks and connectors (SVG) */}
-        <svg className="absolute inset-0 h-full w-full" viewBox="0 0 360 360" aria-hidden>
-          <defs>
-            <linearGradient id="g1" x1="0%" x2="100%">
-              <stop offset="0%" stopColor="rgba(199,166,110,0.0)" />
-              <stop offset="60%" stopColor="rgba(199,166,110,0.14)" />
-              <stop offset="100%" stopColor="rgba(199,166,110,0.28)" />
-            </linearGradient>
-          </defs>
-          {/* outer ticks */}
-          {Array.from({ length: 12 }).map((_, t) => {
-            const a = ((t / 12) * Math.PI * 2) - Math.PI / 2;
-            const x1 = 180 + Math.cos(a) * (radius + 10);
-            const y1 = 180 + Math.sin(a) * (radius + 10);
-            const x2 = 180 + Math.cos(a) * (radius + 2);
-            const y2 = 180 + Math.sin(a) * (radius + 2);
-            return (
-              <line key={`tick-${t}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(199,166,110,0.12)" strokeWidth={1} strokeLinecap="round" />
-            );
-          })}
-          {steps.map((_, i) => {
-            const angle = (i / steps.length) * Math.PI * 2 - Math.PI / 2;
-            const x = 180 + Math.cos(angle) * radius;
-            const y = 180 + Math.sin(angle) * radius;
-            return (
-              <motion.path
-                key={i}
-                d={`M180,180 C${(180 + Math.cos(angle) * (radius * 0.45)).toFixed(2)},${(180 +
-                  Math.sin(angle) * (radius * 0.45)).toFixed(2)} ${(
-                  x * 0.95
-                ).toFixed(2)},${(y * 0.95).toFixed(2)} ${x.toFixed(2)},${y.toFixed(2)}`}
-                stroke="url(#g1)"
-                strokeWidth={1.5}
-                fill="none"
-                strokeLinecap="round"
-                initial={{ pathLength: 0 }}
-                animate={prefersReducedMotion ? {} : { pathLength: 1 }}
-                transition={{ duration: 0.9, ease: "easeOut" }}
-                className="opacity-60"
-              />
-            );
-          })}
-        </svg>
-
-        {/* steps */}
-        {/* Render main clock markers (12/3/6/9) */}
-        {mainIndices.map((mi, idx) => {
-          const angleDeg = -90 + idx * 90; // -90 = 12 o'clock, +90 steps
-          const rad = (angleDeg * Math.PI) / 180;
-          const x = Math.cos(rad) * radius;
-          const y = Math.sin(rad) * radius;
-          const s = steps[mi];
-          const isActive = mi === active;
-          return (
-            <motion.button
-                key={`main-${mi}`}
-                onMouseEnter={() => {
-                  setActive(mi);
-                  onActiveChange?.(mi);
-                }}
-                onFocus={() => {
-                  setActive(mi);
-                  onActiveChange?.(mi);
-                }}
-                onClick={() => onOpen(mi)}
-              className="absolute flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md border border-white/8 text-center text-[color:var(--foreground)]"
-              style={{
-                left: `calc(50% + ${x}px)`,
-                top: `calc(50% + ${y}px)`,
-                width: isActive ? 110 : 92,
-                height: isActive ? 110 : 92,
-                transform: "translate(-50%,-50%)",
-                boxShadow: isActive
-                  ? "0 20px 80px -30px rgba(199,166,110,0.55)"
-                  : "0 10px 30px -18px rgba(0,0,0,0.65)",
-                willChange: "transform, box-shadow",
-                borderRadius: "9999px",
-                padding: 6,
-              }}
-              whileHover={prefersReducedMotion ? {} : { scale: 1.04 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 160, damping: 20 }}
-              aria-label={`${s.title}`}
-            >
-              <div className="pointer-events-none flex flex-col items-center justify-center px-2">
-                <div className="text-xs opacity-80">{String(mi + 1).padStart(2, "0")}</div>
-                <div className="mt-1 font-display text-[0.95rem] leading-tight">{s.title}</div>
-              </div>
-            </motion.button>
-          );
-        })}
-
-        {/* rim labels for each step (small text near outer rim) */}
-        {steps.map((s, i) => {
-          const angleDeg = (i / steps.length) * 360 - 90;
-          const rad = (angleDeg * Math.PI) / 180;
-          const lx = Math.cos(rad) * (radius + 34);
-          const ly = Math.sin(rad) * (radius + 34);
-          return (
-            <text
-              key={`label-${i}`}
-              x={180 + lx}
-              y={180 + ly}
-              fontSize={10}
-              textAnchor="middle"
-              fill="rgba(255,255,255,0.6)"
-              style={{ fontFamily: "inherit" }}
-            >
-              {s.title}
-            </text>
-          );
-        })}
-
-        {/* Render mini pins distributed between main markers */}
-        {miniIndices.map((mi, idx) => {
-          // place mini between mainIndices: assign position based on index
-          const groups = miniIndices.length;
-          // find fractional angle by mapping into circle evenly between main markers
-          // we distribute them evenly around full circle where main markers occupy 4 positions
-          const angle = -90 + 360 * ((idx + 0.5) / (groups + mainIndices.length));
-          const rad = (angle * Math.PI) / 180;
-          const x = Math.cos(rad) * (radius * 0.64);
-          const y = Math.sin(rad) * (radius * 0.64);
-          const s = steps[mi];
-          return (
-            <motion.button
-              key={`mini-${mi}`}
-              onMouseEnter={() => {
-                setActive(mi);
-                onActiveChange?.(mi);
-              }}
-              onFocus={() => {
-                setActive(mi);
-                onActiveChange?.(mi);
-              }}
-              onClick={() => onOpen(mi)}
-              className="absolute flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm border border-white/6 text-center text-[color:var(--foreground)]"
-              style={{
-                left: `calc(50% + ${x}px)`,
-                top: `calc(50% + ${y}px)`,
-                width: 42,
-                height: 42,
-                transform: "translate(-50%,-50%)",
-                boxShadow: "0 8px 20px -10px rgba(0,0,0,0.6)",
-                willChange: "transform",
-              }}
-              whileHover={prefersReducedMotion ? {} : { scale: 1.08 }}
-              transition={{ type: "spring", stiffness: 160, damping: 18 }}
-              aria-label={`${s.title}`}
-            >
-              <div className="pointer-events-none flex flex-col items-center justify-center px-1 text-[0.72rem]">
-                <div className="opacity-80">{String(mi + 1).padStart(2, "0")}</div>
-              </div>
-            </motion.button>
-          );
-        })}
-
-        {/* center info and clock hands */}
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center text-center"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-        >
-          {/* clock face */}
-          <div className="absolute h-[180px] w-[180px] rounded-full bg-black/60 border border-white/6" />
-
-          {/* hands: compute angle based on active step */}
-          {(() => {
-            const angle = (active / steps.length) * 360 - 90;
-            return (
-              <>
-                <motion.div
-                  aria-hidden
-                  className="absolute origin-bottom h-[72px] w-[6px] rounded-[4px] bg-gradient-to-b from-[rgba(199,166,110,0.95)] to-[rgba(199,166,110,0.6)] shadow-[0_18px_60px_-30px_rgba(199,166,110,0.35)]"
-                  style={{ bottom: '50%', left: '50%', transformOrigin: '50% 100%' }}
-                  animate={{ rotate: angle }}
-                  transition={{ type: 'spring', stiffness: 140, damping: 20 }}
-                />
-
-                <motion.div
-                  aria-hidden
-                  className="absolute origin-bottom h-[44px] w-[4px] rounded-[4px] bg-[rgba(255,244,230,0.95)] opacity-90"
-                  style={{ bottom: '50%', left: '50%', transformOrigin: '50% 100%' }}
-                  animate={{ rotate: angle * 1.02 }}
-                  transition={{ type: 'spring', stiffness: 120, damping: 18 }}
-                />
-              </>
-            );
-          })()}
-
-          <div className="relative max-w-[58%] -translate-y-1/2 flex-col items-center justify-center text-center process-center">
-            <p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted)]">
-              {String(active + 1).padStart(2, '0')}
-            </p>
-            <h3 className="mt-2 font-display text-lg text-[color:var(--foreground)]">
-              {steps[active].title}
-            </h3>
-            <p className="mt-2 text-sm text-[color:var(--muted)]">{steps[active].description}</p>
-
-            <div className="mt-3 flex items-center gap-2 justify-center">
-              {steps.map((_, i) => (
-                <div key={`dot-${i}`} className={`h-1.5 w-1.5 rounded-full ${i === active ? 'bg-[color:var(--accent)]' : 'bg-white/20'}`} />
-              ))}
-            </div>
-          </div>
-        </motion.div>
-      </motion.div>
-    </div>
-  );
-}
+// Process watch removed.
 
 const galleryFilters = ["All", "Residential", "Commercial", "Materials"] as const;
 
@@ -777,28 +436,9 @@ export function LuxurySite() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const lenisRef = useRef<InstanceType<typeof Lenis> | null>(null);
-  // Process section removed — related state and refs omitted.
   const [selectedGalleryFilter, setSelectedGalleryFilter] = useState<(typeof galleryFilters)[number]>("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [split, setSplit] = useState(56);
-  const [processModalIndex, setProcessModalIndex] = useState<number | null>(null);
-  const [processActiveIndex, setProcessActiveIndex] = useState<number>(0);
-  const [processActiveMicro, setProcessActiveMicro] = useState<number | null>(null);
-
-  const getNearestMain = (idx: number) => {
-    const mainIndices = [0,1,4,5];
-    const len = circularProcessSteps.length;
-    let best = mainIndices[0];
-    let bestDist = Infinity;
-    for (const mi of mainIndices) {
-      const d = Math.min(Math.abs(mi - idx), len - Math.abs(mi - idx));
-      if (d < bestDist) {
-        bestDist = d;
-        best = mi;
-      }
-    }
-    return best;
-  };
   const { setTheme, resolvedTheme } = useTheme();
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
@@ -1390,35 +1030,31 @@ export function LuxurySite() {
         </section>
 
         <section id="process" className="py-12 sm:py-20">
-          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-            <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
-              <div className="lg:pr-8">
-                <Badge>PROCESS</Badge>
-                <h2 className="mt-4 font-display text-4xl leading-[0.95] text-[color:var(--foreground)]">
-                  A concise, circular view of our six-step process.
-                </h2>
-                <p className="mt-4 max-w-lg text-sm text-[color:var(--muted)]">
-                  Precision, timing, execution, and delivery — visualized like a luxury timepiece.
-                </p>
+          <SectionShell
+            eyebrow="PROCESS"
+            title="A clear six-step process built around timing, coordination, and delivery."
+            description="We keep the process section simple and readable: no interactive watch, no decorative complexity, just a direct explanation of how the work moves from brief to handover."
+          />
 
-                <div className="mt-8">
-                  <p className="text-sm text-[color:var(--muted)]">Explore the twelve micro-steps directly on the watch dial — hover or tap a marker.</p>
-                </div>
+          <div className="mx-auto mt-10 max-w-7xl px-6 sm:px-8 lg:px-10">
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {[
+                { title: "Consultation", body: "We align on scope, intent, budget, and expectations before anything starts." },
+                { title: "Design", body: "Concepts, layouts, and material direction are developed into a clear plan." },
+                { title: "Execution", body: "Site work, coordination, and quality control are managed through delivery." },
+                { title: "Selection", body: "Materials are reviewed and confirmed for fit, finish, lead time, and performance." },
+                { title: "Documentation", body: "Shop drawings and coordination details are prepared for trades and production." },
+                { title: "Handover", body: "Final checks, styling, and client walkthrough complete the process cleanly." },
+              ].map((step) => (
+                <Card key={step.title} className="p-6">
+                  <p className="text-xs uppercase tracking-[0.32em] text-[color:var(--muted)]">{step.title}</p>
+                  <p className="mt-4 text-sm leading-7 text-[color:var(--muted)]">{step.body}</p>
+                </Card>
+              ))}
+            </div>
 
-                <div className="mt-8">
-                  <MagneticButton onClick={() => scrollToSection('contact')}>Book Consultation <ArrowRight className="h-4 w-4" /></MagneticButton>
-                </div>
-              </div>
-
-              <div className="flex justify-center lg:justify-end">
-                <div className="w-full max-w-[640px]">
-                  <LuxuryProcessWatch
-                    onOpen={(i: number) => setProcessModalIndex(i)}
-                    activeMicro={processActiveMicro}
-                    onMicroHover={(idx: number | null) => setProcessActiveMicro(idx)}
-                  />
-                </div>
-              </div>
+            <div className="mt-8 flex justify-center">
+              <MagneticButton onClick={() => scrollToSection('contact')}>Book Consultation <ArrowRight className="h-4 w-4" /></MagneticButton>
             </div>
           </div>
         </section>
@@ -1685,46 +1321,6 @@ export function LuxurySite() {
           </div>
         </section>
       </main>
-
-      <AnimatePresence>
-        {processModalIndex !== null ? (
-          <motion.div
-            key="process-modal"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 py-8"
-            onClick={() => setProcessModalIndex(null)}
-          >
-            <motion.div
-              initial={{ y: 24, scale: 0.98 }}
-              animate={{ y: 0, scale: 1 }}
-              exit={{ y: 24, scale: 0.98 }}
-              transition={{ duration: 0.28 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl rounded-2xl border border-[color:var(--border)] bg-[color:var(--background)] p-6 shadow-[0_40px_120px_-60px_rgba(0,0,0,0.9)]"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.32em] text-[color:var(--muted)]">{String(processModalIndex + 1).padStart(2, '0')}</p>
-                  <h3 className="mt-2 font-display text-2xl text-[color:var(--foreground)]">{circularProcessSteps[processModalIndex].title}</h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setProcessModalIndex(null)}
-                  className="rounded-full border border-[color:var(--border)] p-2 text-sm"
-                  aria-label="Close"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <p className="mt-4 text-sm text-[color:var(--muted)]">{circularProcessSteps[processModalIndex].description}</p>
-              <div className="mt-4 text-sm text-[color:var(--muted)]">{circularProcessSteps[processModalIndex].detail}</div>
-            </motion.div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
 
       <footer className="border-t border-[color:var(--border)] bg-[color:var(--background)]/75 px-6 py-10 backdrop-blur-xl sm:px-8 lg:px-10">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
