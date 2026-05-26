@@ -1157,7 +1157,7 @@ export function LuxurySite() {
                       className={`group relative overflow-hidden rounded-[1.75rem] border text-left transition-transform duration-300 hover:-translate-y-1 ${layout.cardClass} ${galleryBorder}`}
                     >
                       <div className={`${layout.imageClass} relative overflow-hidden w-full`}>
-                        <Image src={item.image} alt={item.title} objectPosition={item.objectPosition} className="h-full w-full object-cover block" />
+                        <Image src={item.image} alt={item.title} className="h-full w-full object-cover object-bottom block" />
                       </div>
                       <div className={`absolute inset-0 ${galleryOverlay}`} />
                       <div className="absolute inset-0 flex flex-col justify-end p-5">
