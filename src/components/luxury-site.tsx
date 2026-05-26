@@ -185,62 +185,8 @@ const testimonials = [
   },
 ];
 
-const galleryItems: GalleryItem[] = [
-  {
-    title: "Marble Lobby Sequence",
-    category: "Commercial",
-    note: "Dramatic stone surfaces and soft light for a refined first impression.",
-    accent: "from-stone-950 via-zinc-700 to-amber-900",
-    image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.28.44 PM (1).jpeg",
-    layoutCardClass: "",
-    imageClass: "h-[22rem]",
-  },
-  {
-    title: "Warm Wood Suite",
-    category: "Residential",
-    note: "Natural grain, layered drapery, and tailored geometry for quiet luxury.",
-    accent: "from-amber-950 via-stone-800 to-neutral-600",
-    image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.28.44 PM (2).jpeg",
-    layoutCardClass: "xl:row-span-2",
-    imageClass: "h-[24rem]",
-  },
-  {
-    title: "Acrylic Study Wall",
-    category: "Materials",
-    note: "A close study of finishes, textures, and surface depth under soft lighting.",
-    accent: "from-zinc-950 via-stone-700 to-neutral-500",
-    image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.28.44 PM.jpeg",
-    layoutCardClass: "",
-    imageClass: "h-[22rem]",
-  },
-  {
-    title: "Chef Kitchen Detail",
-    category: "Residential",
-    note: "Modular precision balanced with warm task lighting and seamless detailing.",
-    accent: "from-neutral-950 via-stone-700 to-amber-800",
-    image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.28.45 PM.jpeg",
-    layoutCardClass: "xl:row-span-2",
-    imageClass: "h-[24rem]",
-  },
-  {
-    title: "Executive Lounge",
-    category: "Commercial",
-    note: "Muted palette, generous spacing, and controlled reflections across the room.",
-    accent: "from-stone-900 via-neutral-700 to-zinc-500",
-    image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.37.54 PM.jpeg",
-    layoutCardClass: "xl:row-span-2",
-    imageClass: "h-[24rem]",
-  },
-  {
-    title: "Texture Sample Grid",
-    category: "Materials",
-    note: "Plywood, veneer, and laminate combinations arranged for rapid selection.",
-    accent: "from-amber-900 via-stone-700 to-neutral-500",
-    image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.37.55 PM.jpeg",
-    layoutCardClass: "",
-    imageClass: "h-[22rem]",
-  },
-];
+// Default/static items remain as a fallback while manifest loads.
+const galleryItems: GalleryItem[] = [];
 
 const stats = [
   { value: "120+", label: "Projects Delivered" },
@@ -473,14 +419,48 @@ export function LuxurySite() {
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 });
+  // replace gallery items with manifest-generated list (all images) when available
+  const [manifestItems, setManifestItems] = useState<GalleryItem[] | null>(null);
 
-  const gallery = useMemo(
-    () =>
-      selectedGalleryFilter === "All"
-        ? galleryItems
-        : galleryItems.filter((item) => item.category === selectedGalleryFilter),
-    [selectedGalleryFilter],
-  );
+  useEffect(() => {
+    let mounted = true;
+    fetch('/dheeraj-images/manifest.json')
+      .then((r) => {
+        if (!r.ok) throw new Error('manifest not found');
+        return r.json();
+      })
+      .then((files: { name: string; title?: string }[]) => {
+        if (!mounted) return;
+        const items = files.map((f, i) => {
+          const title = f.title || f.name.replace(/\.[^.]+$/, '');
+          return {
+            title,
+            category: 'Residential',
+            note: '',
+            accent: '',
+            image: `/dheeraj-images/${encodeURIComponent(f.name)}`,
+            layoutCardClass: galleryCardLayouts[i % galleryCardLayouts.length].cardClass,
+            imageClass: galleryCardLayouts[i % galleryCardLayouts.length].imageClass,
+          } as GalleryItem;
+        });
+        setManifestItems(items);
+      })
+      .catch(() => {
+        // ignore; fallback will be used
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const effectiveGallery = manifestItems ?? galleryItems;
+
+  const gallery = useMemo(() => {
+    const source = effectiveGallery;
+    return selectedGalleryFilter === "All"
+      ? source
+      : source.filter((item) => item.category === selectedGalleryFilter);
+  }, [selectedGalleryFilter, effectiveGallery]);
 
   useEffect(() => {
     // Toggle this to re-enable smooth scrolling during debugging.
