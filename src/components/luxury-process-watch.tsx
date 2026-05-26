@@ -257,27 +257,31 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
                 <circle cx="380" cy="380" r="6" fill="#0b0b0b" />
               </g>
 
+              {/* center dashboard content moved into SVG to ensure pixel-perfect alignment */}
+              {/* dashboard: render center info inside an SVG foreignObject so it scales and centers with the dial */}
+              {view === 'dashboard' ? (
+                <foreignObject x={260} y={320} width={240} height={120} className="pointer-events-none">
+                  <div style={{ width: '240px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', pointerEvents: 'none', fontFamily: "Cinzel, 'Playfair Display', Georgia, serif" }}>
+                    {activeDetail ? (
+                      <div style={{ color: 'var(--muted)', fontSize: 14, padding: '0 8px' }}>{activeDetail}</div>
+                    ) : activeMajor !== null ? (
+                      <div style={{ color: 'var(--muted)', fontSize: 13, padding: '0 8px' }}>
+                        <div style={{ fontWeight: 600, letterSpacing: '0.06em' }}>{majorInfo[activeMajor].title}</div>
+                        <div style={{ marginTop: 6, fontSize: 12, opacity: 0.9, maxWidth: 240 }}>{majorInfo[activeMajor].detail}</div>
+                      </div>
+                    ) : (
+                      <div />
+                    )}
+                  </div>
+                </foreignObject>
+              ) : (
+                <></>
+              )}
+
             </svg>
 
-            {/* center/detail overlay — switches between dashboard and detail views */}
-            {view === 'dashboard' ? (
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                <div className="w-[260px] h-[140px] flex items-center justify-center">
-                  {activeDetail ? (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pointer-events-none text-center px-3">
-                      <p className="text-sm text-[color:var(--muted)]">{activeDetail}</p>
-                    </motion.div>
-                  ) : activeMajor !== null ? (
-                    <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="pointer-events-none text-center px-3">
-                      <p className="text-sm text-[color:var(--muted)]">{majorInfo[activeMajor].title}</p>
-                      <p className="mt-2 text-xs text-[color:var(--muted)] max-w-[260px]">{majorInfo[activeMajor].detail}</p>
-                    </motion.div>
-                  ) : (
-                    <div className="w-full h-full" />
-                  )}
-                </div>
-              </div>
-            ) : (
+            {/* full-screen detail overlay when a major is opened */}
+            {view === 'detail' ? (
               <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-auto">
                 <div className="bg-black/85 p-8 rounded-2xl max-w-[760px] mx-4 text-white">
                   <div className="flex items-start justify-between">
@@ -291,7 +295,7 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
                   </div>
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* interactive micro markers overlay for hover/click */}
