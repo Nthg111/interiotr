@@ -71,6 +71,7 @@ type GalleryItem = {
   category: "Residential" | "Commercial" | "Materials";
   note: string;
   accent: string;
+  image: string;
 };
 
 const services: Service[] = [
@@ -188,36 +189,42 @@ const galleryItems: GalleryItem[] = [
     category: "Commercial",
     note: "Dramatic stone surfaces and soft light for a refined first impression.",
     accent: "from-stone-950 via-zinc-700 to-amber-900",
+    image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.28.44 PM (1).jpeg",
   },
   {
     title: "Warm Wood Suite",
     category: "Residential",
     note: "Natural grain, layered drapery, and tailored geometry for quiet luxury.",
     accent: "from-amber-950 via-stone-800 to-neutral-600",
+    image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.28.44 PM (2).jpeg",
   },
   {
     title: "Acrylic Study Wall",
     category: "Materials",
     note: "A close study of finishes, textures, and surface depth under soft lighting.",
     accent: "from-zinc-950 via-stone-700 to-neutral-500",
+    image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.28.44 PM.jpeg",
   },
   {
     title: "Chef Kitchen Detail",
     category: "Residential",
     note: "Modular precision balanced with warm task lighting and seamless detailing.",
     accent: "from-neutral-950 via-stone-700 to-amber-800",
+    image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.28.45 PM.jpeg",
   },
   {
     title: "Executive Lounge",
     category: "Commercial",
     note: "Muted palette, generous spacing, and controlled reflections across the room.",
     accent: "from-stone-900 via-neutral-700 to-zinc-500",
+    image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.37.54 PM.jpeg",
   },
   {
     title: "Texture Sample Grid",
     category: "Materials",
     note: "Plywood, veneer, and laminate combinations arranged for rapid selection.",
     accent: "from-amber-900 via-stone-700 to-neutral-500",
+    image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.37.55 PM.jpeg",
   },
 ];
 
@@ -1167,7 +1174,9 @@ export function LuxurySite() {
                       onClick={() => setLightboxIndex(index)}
                       className={`group relative overflow-hidden rounded-[1.75rem] border text-left transition-transform duration-300 hover:-translate-y-1 ${layout.cardClass} ${galleryBorder}`}
                     >
-                      <div className={`bg-gradient-to-br ${item.accent} ${layout.imageClass}`} />
+                      <div className={`${layout.imageClass} relative overflow-hidden`}>
+                        <img src={item.image} alt={item.title} className="absolute inset-0 h-full w-full object-cover" />
+                      </div>
                       <div className={`absolute inset-0 ${galleryOverlay}`} />
                       <div className="absolute inset-0 flex flex-col justify-end p-5">
                         <div className={`flex items-center justify-between text-xs uppercase tracking-[0.25em] ${themeIsDark ? "text-white/65" : "text-[color:var(--muted)]"}`}>
