@@ -899,10 +899,10 @@ export function LuxurySite() {
                       ))}
                     </div>
                   </div>
-                  <div className="relative min-h-[28rem] border-t border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(199,166,110,0.14),transparent_35%),radial-gradient(circle_at_top,rgba(255,255,255,0.15),transparent_25%),linear-gradient(135deg,rgba(31,24,18,0.96),rgba(10,10,10,0.94))] lg:border-t-0 lg:border-l">
+                  <div className="relative min-h-[36rem] border-t border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(199,166,110,0.14),transparent_35%),radial-gradient(circle_at_top,rgba(255,255,255,0.15),transparent_25%),linear-gradient(135deg,rgba(31,24,18,0.96),rgba(10,10,10,0.94))] lg:min-h-[28rem] lg:border-t-0 lg:border-l">
                     <div className="absolute inset-0 bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.07),transparent)]" />
-                    <div className="absolute inset-0 p-6 sm:p-8">
-                      <div className="flex h-full flex-col justify-between rounded-[1.5rem] border border-white/10 bg-black/15 p-5 backdrop-blur-xl">
+                    <div className="relative p-6 sm:p-8 lg:absolute lg:inset-0">
+                      <div className="flex h-full flex-col justify-between gap-6 rounded-[1.5rem] border border-white/10 bg-black/15 p-5 backdrop-blur-xl">
                         <div>
                           <p className="text-xs uppercase tracking-[0.4em] text-white/60">
                             Company Story
