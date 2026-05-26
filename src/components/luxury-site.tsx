@@ -41,7 +41,7 @@ import {
   Ruler,
   Send,
 } from "lucide-react";
-import { useTheme } from "next-themes";
+
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -462,14 +462,14 @@ function MagneticButton({
 }
 
 export function LuxurySite() {
-  const [mounted, setMounted] = useState(false);
+  
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const lenisRef = useRef<InstanceType<typeof Lenis> | null>(null);
   const [selectedGalleryFilter, setSelectedGalleryFilter] = useState<(typeof galleryFilters)[number]>("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [split, setSplit] = useState(56);
-  const { setTheme, resolvedTheme } = useTheme();
+  
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 });
@@ -483,14 +483,11 @@ export function LuxurySite() {
   );
 
   useEffect(() => {
-    const mountFrame = requestAnimationFrame(() => setMounted(true));
-      // Toggle this to re-enable smooth scrolling during debugging.
-      const enableLenis = true;
+    // Toggle this to re-enable smooth scrolling during debugging.
+    const enableLenis = true;
 
     if (!enableLenis) {
-      return () => {
-        cancelAnimationFrame(mountFrame);
-      };
+      return;
     }
 
     lenisRef.current = new Lenis({
@@ -511,7 +508,6 @@ export function LuxurySite() {
     frame = requestAnimationFrame(raf);
 
     return () => {
-      cancelAnimationFrame(mountFrame);
       cancelAnimationFrame(frame);
       try {
         lenisRef.current?.destroy();
@@ -530,7 +526,7 @@ export function LuxurySite() {
 
   // Process section removed — ScrollTrigger/GSAP logic omitted.
 
-  const themeIsDark = resolvedTheme ? resolvedTheme === "dark" : true;
+  const themeIsDark = true;
 
   // debugDisableOverlays: when true, make fixed overlays non-interactive to test scroll blocking.
   const debugDisableOverlays = false;
@@ -605,18 +601,6 @@ export function LuxurySite() {
           </nav>
 
           <div className="flex items-center gap-2">
-            {mounted ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-10 w-10 rounded-full border border-[color:var(--border)]"
-                aria-label="Toggle theme"
-                onClick={() => setTheme(themeIsDark ? "light" : "dark")}
-              >
-                {themeIsDark ? <SunMedium className="h-4 w-4" /> : <MoonStar className="h-4 w-4" />}
-              </Button>
-            ) : null}
-
             <Button
               variant="ghost"
               size="sm"
@@ -1179,8 +1163,8 @@ export function LuxurySite() {
                   ? "border-[color:var(--border)]"
                   : "border-[rgba(40,32,24,0.08)] bg-[rgba(255,255,255,0.72)] shadow-[0_24px_80px_-48px_rgba(90,64,35,0.14)]";
                 const galleryOverlay = themeIsDark
-                  ? "bg-[linear-gradient(180deg,transparent_30%,rgba(10,10,10,0.84))]"
-                  : "bg-[linear-gradient(180deg,transparent_34%,rgba(250,246,240,0.72))]";
+                  ? "bg-[linear-gradient(180deg,transparent_30%,rgba(10,10,10,0.5))]"
+                  : "bg-[linear-gradient(180deg,transparent_34%,rgba(250,246,240,0.28))]";
 
                 return (
                   <Reveal key={item.title} delay={index * 0.04}>
@@ -1189,8 +1173,8 @@ export function LuxurySite() {
                       onClick={() => setLightboxIndex(index)}
                       className={`group relative overflow-hidden rounded-[1.75rem] border text-left transition-transform duration-300 hover:-translate-y-1 ${layout.cardClass} ${galleryBorder}`}
                     >
-                      <div className={`${layout.imageClass} relative overflow-hidden`}>
-                        <img src={item.image} alt={item.title} className="absolute inset-0 h-full w-full object-cover" />
+                      <div className={`${layout.imageClass} relative overflow-hidden w-full`}>
+                        <img src={item.image} alt={item.title} className="h-full w-full object-cover block" />
                       </div>
                       <div className={`absolute inset-0 ${galleryOverlay}`} />
                       <div className="absolute inset-0 flex flex-col justify-end p-5">
