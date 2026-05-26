@@ -10,7 +10,16 @@ function tidyTitle(name) {
 
 try {
   const files = fs.readdirSync(srcDir).filter((f) => /\.(jpe?g|png|webp)$/i.test(f));
-  const items = files.map((name) => ({ name, title: tidyTitle(name) }));
+  const items = files.map((name) => {
+    const lower = name.toLowerCase();
+    const isBathroom = /basin|sink|wash|toilet|bathroom|bath|wc/i.test(lower);
+    const obj = { name, title: tidyTitle(name) };
+    if (isBathroom) {
+      // heuristic: bathroom photos often have the subject towards the lower-left
+      obj.objectPosition = 'left 100%';
+    }
+    return obj;
+  });
   fs.writeFileSync(outFile, JSON.stringify(items, null, 2), 'utf8');
   console.log('Wrote', outFile);
 } catch (err) {

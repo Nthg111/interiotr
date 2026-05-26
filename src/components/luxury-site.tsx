@@ -48,6 +48,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import Image from "./ui/image";
 
 type IconComponent = React.ComponentType<{ className?: string }>;
 
@@ -74,6 +75,7 @@ type GalleryItem = {
   image: string;
   layoutCardClass?: string;
   imageClass?: string;
+  objectPosition?: string;
 };
 
 const services: Service[] = [
@@ -429,7 +431,7 @@ export function LuxurySite() {
         if (!r.ok) throw new Error('manifest not found');
         return r.json();
       })
-      .then((files: { name: string; title?: string }[]) => {
+      .then((files: { name: string; title?: string; objectPosition?: string }[]) => {
         if (!mounted) return;
         const items = files.map((f, i) => {
           const title = f.title || f.name.replace(/\.[^.]+$/, '');
@@ -441,6 +443,7 @@ export function LuxurySite() {
             image: `/dheeraj-images/${encodeURIComponent(f.name)}`,
             layoutCardClass: galleryCardLayouts[i % galleryCardLayouts.length].cardClass,
             imageClass: galleryCardLayouts[i % galleryCardLayouts.length].imageClass,
+            objectPosition: f.objectPosition,
           } as GalleryItem;
         });
         setManifestItems(items);
@@ -1154,7 +1157,7 @@ export function LuxurySite() {
                       className={`group relative overflow-hidden rounded-[1.75rem] border text-left transition-transform duration-300 hover:-translate-y-1 ${layout.cardClass} ${galleryBorder}`}
                     >
                       <div className={`${layout.imageClass} relative overflow-hidden w-full`}>
-                        <img src={item.image} alt={item.title} className="h-full w-full object-cover block" />
+                        <Image src={item.image} alt={item.title} objectPosition={item.objectPosition} className="h-full w-full object-cover block" />
                       </div>
                       <div className={`absolute inset-0 ${galleryOverlay}`} />
                       <div className="absolute inset-0 flex flex-col justify-end p-5">
@@ -1200,9 +1203,10 @@ export function LuxurySite() {
                       <ChevronLeft className="h-6 w-6" />
                     </button>
 
-                    <img
+                    <Image
                       src={gallery[lightboxIndex].image}
                       alt={gallery[lightboxIndex].note || ''}
+                      objectPosition={gallery[lightboxIndex].objectPosition}
                       className="max-h-[70vh] w-auto object-contain"
                     />
 
