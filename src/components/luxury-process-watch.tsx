@@ -35,6 +35,14 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
   const [active, setActive] = useState<number | null>(null);
 
   const allSteps = useMemo(() => MICRO_STEPS, []);
+  const [activeMajor, setActiveMajor] = useState<number | null>(null);
+
+  const majorInfo = [
+    { title: 'Consultation', detail: 'We start with you — understanding needs, preferences, and the essence of your space.' },
+    { title: 'Design', detail: 'Concept exploration, space planning and 3D visualisation.' },
+    { title: 'Execution', detail: 'Site execution, coordination and quality control.' },
+    { title: 'Delivery', detail: 'Final handover, styling, and walkthrough.' },
+  ];
 
   useEffect(() => {
     if (prefersReduced) return;
@@ -87,7 +95,7 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
   }, [activeMicro]);
 
   return (
-    <div ref={containerRef} className="w-full flex items-center justify-center">
+    <div ref={containerRef} className="w-full flex items-center justify-center" style={{ fontFamily: "Cinzel, 'Playfair Display', Georgia, serif" }}>
       <div className="process-frame p-6 relative max-w-[640px] mx-auto">
         <div className="absolute inset-0 -z-10 flex items-center justify-center">
           <div className="w-[420px] h-[420px] rounded-full bg-gradient-to-b from-black/40 to-black/20 opacity-30 blur-[40px]" />
@@ -134,7 +142,7 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
                 const y = 210 + Math.sin(a) * r;
                 const label = idx === 0 ? 'Consultation' : idx === 1 ? 'Design' : idx === 2 ? 'Execution' : 'Delivery';
                 return (
-                  <g key={pos} className="lux-major" transform={`translate(${x},${y})`}>
+                  <g key={pos} className="lux-major" transform={`translate(${x},${y})`} onClick={() => { setActiveMajor(idx); const angle=(pos/12)*360; gsap.to(mainHandRef.current,{rotate:angle-90,duration:0.5,ease:'power3.out'}); }}>
                     <g className="lux-major-badge">
                       <circle cx={0} cy={0} r={26} fill="#0b0b0b" stroke="#c7a66e22" strokeWidth={1} />
                       <circle cx={0} cy={0} r={18} fill="url(#goldGrad)" opacity={0.06} />
@@ -183,6 +191,20 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
                 );
               })}
 
+              {/* inner ring labels (replace numbers) */}
+              {allSteps.map((m, i) => {
+                const a = (i / allSteps.length) * Math.PI * 2 - Math.PI / 2;
+                const r = 156; // slightly larger radius for the label ring
+                const x = 210 + Math.cos(a) * r;
+                const y = 210 + Math.sin(a) * r;
+                const angleDeg = (a * 180) / Math.PI + 90;
+                return (
+                  <text key={`label-${i}`} x={x} y={y} fontSize={9} fontFamily="serif" fill="#ffffff66" textAnchor="middle" transform={`rotate(${angleDeg}, ${x}, ${y})`}>
+                    {m}
+                  </text>
+                );
+              })}
+
               {/* glass reflection path */}
               <g>
                 <path d="M60,40 C160,10 260,10 360,40 L360,60 C260,30 160,30 60,60 Z" fill="rgba(255,255,255,0.03)" />
@@ -193,6 +215,19 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
               <div ref={mainHandRef as any} className="origin-bottom absolute h-[140px] w-[10px] rounded-[8px] bg-gradient-to-b from-[#c7a66e] to-[#c7a66e]/60 shadow-[0_40px_80px_-40px_rgba(199,166,110,0.25)]" style={{ bottom: '50%', left: '50%', transformOrigin: '50% 100%' }} />
               <div ref={thinHandRef as any} className="origin-bottom absolute h-[92px] w-[4px] rounded-[4px] bg-white/90 opacity-90" style={{ bottom: '50%', left: '50%', transformOrigin: '50% 100%' }} />
               <div ref={centerRef as any} className="absolute h-8 w-8 rounded-full bg-[radial-gradient(circle,#fff7ea,rgba(199,166,110,0.12))] border border-white/8" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }} />
+              {/* center detail circle: show active major info here */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                <div className="w-[220px] h-[120px] flex items-center justify-center">
+                  {activeMajor !== null ? (
+                    <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="pointer-events-none text-center">
+                      <p className="text-sm text-[color:var(--muted)]">{majorInfo[activeMajor].title}</p>
+                      <p className="mt-2 text-xs text-[color:var(--muted)] max-w-[220px]">{majorInfo[activeMajor].detail}</p>
+                    </motion.div>
+                  ) : (
+                    <div className="w-full h-full" />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
