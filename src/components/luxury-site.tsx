@@ -212,7 +212,6 @@ const stats = [
   { value: "120+", label: "Projects Delivered" },
   { value: "18", label: "Years of Experience" },
   { value: "9", label: "Material Categories" },
-  { value: "360°", label: "Design to Handover" },
 ];
 // Process watch removed.
 
