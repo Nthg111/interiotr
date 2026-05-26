@@ -1413,9 +1413,9 @@ export function LuxurySite() {
               <div className="flex justify-center lg:justify-end">
                 <div className="w-full max-w-[640px]">
                   <LuxuryProcessWatch
-                    onOpen={(i) => setProcessModalIndex(i)}
+                    onOpen={(i: number) => setProcessModalIndex(i)}
                     activeMicro={processActiveMicro}
-                    onMicroHover={(idx) => setProcessActiveMicro(idx)}
+                    onMicroHover={(idx: number | null) => setProcessActiveMicro(idx)}
                   />
                 </div>
               </div>
