@@ -1033,21 +1033,22 @@ export function LuxurySite() {
           <SectionShell
             eyebrow="PROCESS"
             title="A clear six-step process built around timing, coordination, and delivery."
-            description="We keep the process section simple and readable: no interactive watch, no decorative complexity, just a direct explanation of how the work moves from brief to handover."
+            description="A simple, direct workflow that moves from brief to handover with clear checkpoints at every stage."
           />
 
           <div className="mx-auto mt-10 max-w-7xl px-6 sm:px-8 lg:px-10">
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {[
-                { title: "Consultation", body: "We align on scope, intent, budget, and expectations before anything starts." },
-                { title: "Design", body: "Concepts, layouts, and material direction are developed into a clear plan." },
-                { title: "Execution", body: "Site work, coordination, and quality control are managed through delivery." },
-                { title: "Selection", body: "Materials are reviewed and confirmed for fit, finish, lead time, and performance." },
-                { title: "Documentation", body: "Shop drawings and coordination details are prepared for trades and production." },
-                { title: "Handover", body: "Final checks, styling, and client walkthrough complete the process cleanly." },
+                { title: "01. Briefing", body: "We align on scope, intent, budget, and expectations before anything starts." },
+                { title: "02. Concept Design", body: "Layouts, mood direction, and material ideas are shaped into a clear direction." },
+                { title: "03. Material Selection", body: "Finishes, products, and details are reviewed for fit, performance, and timing." },
+                { title: "04. Documentation", body: "Drawings, specifications, and coordination details are prepared for production." },
+                { title: "05. Execution", body: "Site work, vendor coordination, and quality control are managed through delivery." },
+                { title: "06. Handover", body: "Final checks, styling, and walkthroughs complete the project cleanly." },
               ].map((step) => (
                 <Card key={step.title} className="p-6">
-                  <p className="text-xs uppercase tracking-[0.32em] text-[color:var(--muted)]">{step.title}</p>
+                  <p className="text-xs uppercase tracking-[0.32em] text-[color:var(--muted)]">Process step</p>
+                  <h3 className="mt-4 font-display text-2xl text-[color:var(--foreground)]">{step.title}</h3>
                   <p className="mt-4 text-sm leading-7 text-[color:var(--muted)]">{step.body}</p>
                 </Card>
               ))}
