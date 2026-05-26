@@ -1195,7 +1195,7 @@ export function LuxurySite() {
                     const isHero = index === 0;
 
                     return (
-                      <Reveal key={item.title} delay={index * 0.04}>
+                      <Reveal key={item.title} delay={0}>
                         <button
                           type="button"
                           onClick={() => setLightboxIndex(index)}
@@ -1205,7 +1205,7 @@ export function LuxurySite() {
                             src={item.image}
                             alt={item.title}
                             objectPosition={item.objectPosition ?? slot.imagePosition}
-                            loading="lazy"
+                            loading="eager"
                             decoding="async"
                             className="h-full w-full object-cover"
                           />
