@@ -770,17 +770,7 @@ export function LuxurySite() {
                     <Card className="flex h-full min-h-[8.75rem] aspect-square flex-col bg-white/4 p-4 sm:p-5">
                       <p className="font-display text-2xl leading-none text-[color:var(--foreground)] sm:text-3xl">
                         {item.label === "Material Categories" ? (
-                          <>
-                            <span className="hidden md:inline">{item.value}</span>
-                            <picture className="block md:hidden h-8 w-8 rounded-full overflow-hidden">
-                              <source srcSet="/dheeraj-images/ai.png" type="image/png" />
-                              <img
-                                src="/dheeraj-images/ai.svg"
-                                alt="Material categories"
-                                className="h-8 w-8 object-cover"
-                              />
-                            </picture>
-                          </>
+                          <span className="hidden md:inline">{item.value}</span>
                         ) : (
                           item.value
                         )}
@@ -788,6 +778,18 @@ export function LuxurySite() {
                       <p className="mt-3 max-w-full [overflow-wrap:anywhere] text-[0.62rem] leading-4 tracking-[0.11em] text-[color:var(--muted)] sm:text-[0.7rem] sm:leading-5 sm:tracking-[0.16em]">
                         {item.label}
                       </p>
+                      {item.label === "Material Categories" && (
+                        <div className="mt-4 block md:hidden">
+                          <picture className="w-full h-40 rounded-lg overflow-hidden">
+                            <source srcSet="/dheeraj-images/ai.png" type="image/png" />
+                            <img
+                              src="/dheeraj-images/ai.svg"
+                              alt="Material categories"
+                              className="w-full h-full object-cover"
+                            />
+                          </picture>
+                        </div>
+                      )}
                     </Card>
                   </Reveal>
                 ))}
