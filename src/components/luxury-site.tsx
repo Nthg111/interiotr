@@ -1162,8 +1162,8 @@ export function LuxurySite() {
                           <span>{item.category}</span>
                           <ScanSearch className={`h-4 w-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${themeIsDark ? "text-white" : "text-[color:var(--foreground)]"}`} />
                         </div>
-                        <h3 className={`mt-4 font-display text-3xl ${themeIsDark ? "text-white" : "text-[color:var(--foreground)]"}`}>{item.title}</h3>
-                        <p className={`mt-3 max-w-sm text-sm leading-7 ${themeIsDark ? "text-white/70" : "text-[color:var(--muted)]"}`}>{item.note}</p>
+                        {/* Remove filename/title display to avoid overlapping text */}
+                        <div className="mt-3 h-6" aria-hidden />
                       </div>
                     </button>
                   </Reveal>
@@ -1189,16 +1189,37 @@ export function LuxurySite() {
                   onClick={(event) => event.stopPropagation()}
                   className="w-full max-w-4xl overflow-hidden rounded-[2rem] border border-white/10 bg-[color:var(--background)] shadow-[0_40px_120px_-60px_rgba(0,0,0,0.9)]"
                 >
-                  <div className={`h-[24rem] bg-gradient-to-br ${gallery[lightboxIndex].accent}`} />
+                  <div className="relative bg-black/80 p-6 flex items-center justify-center">
+                    <button
+                      type="button"
+                      aria-label="Previous image"
+                      onClick={() => setLightboxIndex((lightboxIndex - 1 + gallery.length) % gallery.length)}
+                      className="absolute left-6 top-1/2 -translate-y-1/2 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-black/60 text-white shadow-xl ring-1 ring-white/10"
+                      style={{ transform: 'translateY(-50%)' }}
+                    >
+                      <ChevronLeft className="h-6 w-6" />
+                    </button>
+
+                    <img
+                      src={gallery[lightboxIndex].image}
+                      alt={gallery[lightboxIndex].note || ''}
+                      className="max-h-[70vh] w-auto object-contain"
+                    />
+
+                    <button
+                      type="button"
+                      aria-label="Next image"
+                      onClick={() => setLightboxIndex((lightboxIndex + 1) % gallery.length)}
+                      className="absolute right-6 top-1/2 -translate-y-1/2 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-black/60 text-white shadow-xl ring-1 ring-white/10"
+                      style={{ transform: 'translateY(-50%)' }}
+                    >
+                      <ChevronRight className="h-6 w-6" />
+                    </button>
+                  </div>
                   <div className="grid gap-5 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
                     <div>
                       <Badge>{gallery[lightboxIndex].category}</Badge>
-                      <h3 className="mt-4 font-display text-4xl text-[color:var(--foreground)]">
-                        {gallery[lightboxIndex].title}
-                      </h3>
-                      <p className="mt-4 max-w-2xl text-sm leading-7 text-[color:var(--muted)]">
-                        {gallery[lightboxIndex].note}
-                      </p>
+                      <p className="mt-4 text-sm text-[color:var(--muted)]">Image {lightboxIndex + 1} of {gallery.length}</p>
                     </div>
                     <Button variant="outline" onClick={() => setLightboxIndex(null)}>
                       Close
