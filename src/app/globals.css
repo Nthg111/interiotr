@@ -124,6 +124,7 @@ section {
   animation: process-rotate var(--process-rotate-duration) linear infinite;
   transition: transform 300ms ease;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .process-rotator:hover,
 .process-rotator:focus-within {
@@ -242,3 +243,4 @@ section {
   outline: none;
   border-radius: 1rem;
 }
+

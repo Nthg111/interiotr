@@ -1,82 +1,182 @@
 [
   {
     "name": "1.jpeg",
-    "title": "1"
+    "title": "1",
+    "width": 4096,
+    "height": 3072,
+    "aspectRatio": 1.3333333333333333,
+    "orientation": "landscape",
+    "featured": false
   },
   {
     "name": "11.jpeg",
-    "title": "11"
+    "title": "11",
+    "width": 1200,
+    "height": 1600,
+    "aspectRatio": 0.75,
+    "orientation": "portrait",
+    "featured": false
   },
   {
     "name": "13.jpeg",
-    "title": "13"
+    "title": "13",
+    "width": 1280,
+    "height": 960,
+    "aspectRatio": 1.3333333333333333,
+    "orientation": "landscape",
+    "featured": false
   },
   {
     "name": "15.jpeg",
-    "title": "15"
+    "title": "15",
+    "width": 1600,
+    "height": 900,
+    "aspectRatio": 1.7777777777777777,
+    "orientation": "landscape",
+    "featured": true
   },
   {
     "name": "3.jpeg",
-    "title": "3"
+    "title": "3",
+    "width": 960,
+    "height": 1280,
+    "aspectRatio": 0.75,
+    "orientation": "portrait",
+    "featured": false
   },
   {
     "name": "5.jpeg",
-    "title": "5"
+    "title": "5",
+    "width": 900,
+    "height": 1600,
+    "aspectRatio": 0.5625,
+    "orientation": "portrait",
+    "featured": true
   },
   {
     "name": "7.jpeg",
-    "title": "7"
+    "title": "7",
+    "width": 960,
+    "height": 1280,
+    "aspectRatio": 0.75,
+    "orientation": "portrait",
+    "featured": false
   },
   {
     "name": "9.jpeg",
-    "title": "9"
+    "title": "9",
+    "width": 960,
+    "height": 1280,
+    "aspectRatio": 0.75,
+    "orientation": "portrait",
+    "featured": false
   },
   {
     "name": "WhatsApp Image 2026-05-23 at 10.28.44 PM (2).jpeg",
-    "title": "WhatsApp Image 2026 05 23 at 10.28.44 PM (2)"
+    "title": "WhatsApp Image 2026 05 23 at 10.28.44 PM (2)",
+    "width": 3072,
+    "height": 4096,
+    "aspectRatio": 0.75,
+    "orientation": "portrait",
+    "featured": false
   },
   {
     "name": "WhatsApp Image 2026-05-23 at 10.28.44 PM.jpeg",
-    "title": "WhatsApp Image 2026 05 23 at 10.28.44 PM"
+    "title": "WhatsApp Image 2026 05 23 at 10.28.44 PM",
+    "width": 4096,
+    "height": 3072,
+    "aspectRatio": 1.3333333333333333,
+    "orientation": "landscape",
+    "featured": false
   },
   {
     "name": "WhatsApp Image 2026-05-23 at 10.28.45 PM.jpeg",
-    "title": "WhatsApp Image 2026 05 23 at 10.28.45 PM"
+    "title": "WhatsApp Image 2026 05 23 at 10.28.45 PM",
+    "width": 3072,
+    "height": 4096,
+    "aspectRatio": 0.75,
+    "orientation": "portrait",
+    "featured": false
   },
   {
     "name": "WhatsApp Image 2026-05-23 at 10.37.55 PM.jpeg",
-    "title": "WhatsApp Image 2026 05 23 at 10.37.55 PM"
+    "title": "WhatsApp Image 2026 05 23 at 10.37.55 PM",
+    "width": 1280,
+    "height": 960,
+    "aspectRatio": 1.3333333333333333,
+    "orientation": "landscape",
+    "featured": false
   },
   {
     "name": "WhatsApp Image 2026-05-23 at 10.41.06 PM.jpeg",
-    "title": "WhatsApp Image 2026 05 23 at 10.41.06 PM"
+    "title": "WhatsApp Image 2026 05 23 at 10.41.06 PM",
+    "width": 535,
+    "height": 875,
+    "aspectRatio": 0.6114285714285714,
+    "orientation": "portrait",
+    "featured": true
   },
   {
     "name": "WhatsApp Image 2026-05-23 at 10.41.07 PM (1).jpeg",
-    "title": "WhatsApp Image 2026 05 23 at 10.41.07 PM (1)"
+    "title": "WhatsApp Image 2026 05 23 at 10.41.07 PM (1)",
+    "width": 1280,
+    "height": 720,
+    "aspectRatio": 1.7777777777777777,
+    "orientation": "landscape",
+    "featured": true
   },
   {
     "name": "WhatsApp Image 2026-05-23 at 10.41.07 PM.jpeg",
-    "title": "WhatsApp Image 2026 05 23 at 10.41.07 PM"
+    "title": "WhatsApp Image 2026 05 23 at 10.41.07 PM",
+    "width": 1280,
+    "height": 720,
+    "aspectRatio": 1.7777777777777777,
+    "orientation": "landscape",
+    "featured": true
   },
   {
     "name": "WhatsApp Image 2026-05-23 at 10.41.08 PM (1).jpeg",
-    "title": "WhatsApp Image 2026 05 23 at 10.41.08 PM (1)"
+    "title": "WhatsApp Image 2026 05 23 at 10.41.08 PM (1)",
+    "width": 1280,
+    "height": 720,
+    "aspectRatio": 1.7777777777777777,
+    "orientation": "landscape",
+    "featured": true
   },
   {
     "name": "WhatsApp Image 2026-05-23 at 10.41.09 PM (1).jpeg",
-    "title": "WhatsApp Image 2026 05 23 at 10.41.09 PM (1)"
+    "title": "WhatsApp Image 2026 05 23 at 10.41.09 PM (1)",
+    "width": 1600,
+    "height": 900,
+    "aspectRatio": 1.7777777777777777,
+    "orientation": "landscape",
+    "featured": true
   },
   {
     "name": "WhatsApp Image 2026-05-23 at 10.41.09 PM.jpeg",
-    "title": "WhatsApp Image 2026 05 23 at 10.41.09 PM"
+    "title": "WhatsApp Image 2026 05 23 at 10.41.09 PM",
+    "width": 1600,
+    "height": 900,
+    "aspectRatio": 1.7777777777777777,
+    "orientation": "landscape",
+    "featured": true
   },
   {
     "name": "WhatsApp Image 2026-05-24 at 10.20.19 PM.jpeg",
-    "title": "WhatsApp Image 2026 05 24 at 10.20.19 PM"
+    "title": "WhatsApp Image 2026 05 24 at 10.20.19 PM",
+    "width": 960,
+    "height": 1280,
+    "aspectRatio": 0.75,
+    "orientation": "portrait",
+    "featured": false
   },
   {
     "name": "WhatsApp Image 2026-05-24 at 10.20.22 PM.jpeg",
-    "title": "WhatsApp Image 2026 05 24 at 10.20.22 PM"
+    "title": "WhatsApp Image 2026 05 24 at 10.20.22 PM",
+    "width": 960,
+    "height": 1280,
+    "aspectRatio": 0.75,
+    "orientation": "portrait",
+    "featured": false
   }
 ]

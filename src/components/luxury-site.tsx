@@ -68,6 +68,7 @@ type Project = {
 };
 
 type GalleryItem = {
+  name: string;
   title: string;
   category: "Residential" | "Commercial" | "Materials";
   note: string;
@@ -76,6 +77,22 @@ type GalleryItem = {
   layoutCardClass?: string;
   imageClass?: string;
   objectPosition?: string;
+  width?: number | null;
+  height?: number | null;
+  aspectRatio?: number | null;
+  orientation?: "portrait" | "landscape" | "square";
+  featured?: boolean;
+};
+
+type GalleryManifestItem = {
+  name: string;
+  title?: string;
+  objectPosition?: string;
+  width?: number | null;
+  height?: number | null;
+  aspectRatio?: number | null;
+  orientation?: "portrait" | "landscape" | "square";
+  featured?: boolean;
 };
 
 const services: Service[] = [
@@ -207,6 +224,15 @@ const galleryCardLayouts = [
   { cardClass: "", imageClass: "h-[23rem]" },
   { cardClass: "xl:col-span-2", imageClass: "h-[19rem] sm:h-[20rem]" },
   { cardClass: "", imageClass: "h-[24rem]" },
+] as const;
+
+const galleryCircleLayouts = [
+  { cardClass: "col-span-2 row-span-2 md:col-span-2 md:row-span-2 lg:col-span-2 lg:row-span-2", imagePosition: "center 100%" },
+  { cardClass: "col-span-1 row-span-1 md:col-span-1 md:row-span-1", imagePosition: "center center" },
+  { cardClass: "col-span-1 row-span-1 md:col-span-1 md:row-span-2", imagePosition: "center 72%" },
+  { cardClass: "col-span-1 row-span-1 md:col-span-1 md:row-span-1", imagePosition: "center 40%" },
+  { cardClass: "col-span-2 row-span-1 md:col-span-2 md:row-span-1", imagePosition: "center 84%" },
+  { cardClass: "col-span-1 row-span-1 md:col-span-1 md:row-span-1", imagePosition: "center 56%" },
 ] as const;
 
 // Data for a luxury process clock
@@ -431,19 +457,35 @@ export function LuxurySite() {
         if (!r.ok) throw new Error('manifest not found');
         return r.json();
       })
-      .then((files: { name: string; title?: string; objectPosition?: string }[]) => {
+      .then((files: GalleryManifestItem[]) => {
         if (!mounted) return;
         const items = files.map((f, i) => {
           const title = f.title || f.name.replace(/\.[^.]+$/, '');
           return {
+            name: f.name,
             title,
             category: 'Residential',
             note: '',
             accent: '',
             image: `/dheeraj-images/${encodeURIComponent(f.name)}`,
-            layoutCardClass: galleryCardLayouts[i % galleryCardLayouts.length].cardClass,
-            imageClass: galleryCardLayouts[i % galleryCardLayouts.length].imageClass,
+            layoutCardClass: f.featured
+              ? 'md:col-span-2 xl:col-span-2 xl:row-span-2'
+              : f.orientation === 'portrait'
+                ? galleryCardLayouts[(i + 2) % galleryCardLayouts.length].cardClass
+                : galleryCardLayouts[i % galleryCardLayouts.length].cardClass,
+            imageClass: f.featured
+              ? 'h-[28rem] sm:h-[30rem]'
+              : f.orientation === 'portrait'
+                ? 'h-[29rem] sm:h-[31rem] xl:h-[100%]'
+                : f.orientation === 'landscape'
+                  ? 'h-[20rem] sm:h-[21rem] xl:h-[100%]'
+                  : 'h-[22rem] sm:h-[23rem]',
             objectPosition: f.objectPosition,
+            width: f.width,
+            height: f.height,
+            aspectRatio: f.aspectRatio,
+            orientation: f.orientation,
+            featured: f.featured,
           } as GalleryItem;
         });
         setManifestItems(items);
@@ -1120,8 +1162,8 @@ export function LuxurySite() {
         <section id="gallery" className="py-10 sm:py-20">
           <SectionShell
             eyebrow="Gallery"
-            title="An immersive visual gallery with category filters and lightbox detail."
-            description="The gallery uses elegant transitions, soft overlays, and quick category filtering to keep the experience fluid."
+            title="A square showcase of circular image medallions."
+            description="The gallery now stays clean and sculptural, with circular cards inside a large rounded square and a lightbox for full detail."
           />
 
           <div className="mx-auto mt-10 max-w-7xl px-6 sm:px-8 lg:px-10">
@@ -1138,40 +1180,45 @@ export function LuxurySite() {
               ))}
             </div>
 
-            <div className="mt-6 grid auto-rows-[11rem] gap-4 md:grid-cols-2 xl:grid-cols-3 xl:grid-flow-dense">
-              {gallery.map((item, index) => {
-                const baseLayout = galleryCardLayouts[index % galleryCardLayouts.length];
-                const layout = { cardClass: item.layoutCardClass ?? baseLayout.cardClass, imageClass: item.imageClass ?? baseLayout.imageClass };
-                const galleryBorder = themeIsDark
-                  ? "border-[color:var(--border)]"
-                  : "border-[rgba(40,32,24,0.08)] bg-[rgba(255,255,255,0.72)] shadow-[0_24px_80px_-48px_rgba(90,64,35,0.14)]";
-                const galleryOverlay = themeIsDark
-                  ? "bg-[linear-gradient(180deg,transparent_30%,rgba(10,10,10,0.5))]"
-                  : "bg-[linear-gradient(180deg,transparent_34%,rgba(250,246,240,0.28))]";
+            <div className="mt-6">
+              <div className="gallery-square relative mx-auto aspect-square w-full max-w-[min(100vw-1.5rem,72rem)] overflow-hidden rounded-[2.75rem] border border-[color:var(--border)] bg-[radial-gradient(circle_at_top_left,rgba(199,166,110,0.16),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.06),transparent_20%),linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01))] p-4 shadow-[0_35px_120px_-55px_rgba(0,0,0,0.75)] sm:p-6 lg:p-8">
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                  <div className="absolute left-1/2 top-1/2 h-[72%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/6" />
+                  <div className="absolute left-1/2 top-1/2 h-[52%] w-[52%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/6" />
+                  <div className="absolute -left-20 top-10 h-64 w-64 rounded-full bg-[rgba(199,166,110,0.10)] blur-3xl" />
+                  <div className="absolute -right-10 bottom-0 h-72 w-72 rounded-full bg-[rgba(255,255,255,0.06)] blur-3xl" />
+                </div>
 
-                return (
-                  <Reveal key={item.title} delay={index * 0.04}>
-                    <button
-                      type="button"
-                      onClick={() => setLightboxIndex(index)}
-                      className={`group relative overflow-hidden rounded-[1.75rem] border text-left transition-transform duration-300 hover:-translate-y-1 ${layout.cardClass} ${galleryBorder}`}
-                    >
-                      <div className={`${layout.imageClass} relative overflow-hidden w-full`}>
-                        <Image src={item.image} alt={item.title} className="h-full w-full object-cover object-bottom block" />
-                      </div>
-                      <div className={`absolute inset-0 ${galleryOverlay}`} />
-                      <div className="absolute inset-0 flex flex-col justify-end p-5">
-                        <div className={`flex items-center justify-between text-xs uppercase tracking-[0.25em] ${themeIsDark ? "text-white/65" : "text-[color:var(--muted)]"}`}>
-                          <span>{item.category}</span>
-                          <ScanSearch className={`h-4 w-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${themeIsDark ? "text-white" : "text-[color:var(--foreground)]"}`} />
-                        </div>
-                        {/* Remove filename/title display to avoid overlapping text */}
-                        <div className="mt-3 h-6" aria-hidden />
-                      </div>
-                    </button>
-                  </Reveal>
-                );
-              })}
+                <div className="relative grid h-full auto-rows-min grid-cols-2 gap-3 overflow-y-auto pr-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+                  {gallery.map((item, index) => {
+                    const slot = galleryCircleLayouts[index % galleryCircleLayouts.length];
+                    const isHero = index === 0;
+
+                    return (
+                      <Reveal key={item.title} delay={index * 0.04}>
+                        <button
+                          type="button"
+                          onClick={() => setLightboxIndex(index)}
+                          className={`group relative aspect-square overflow-hidden rounded-full border border-[color:var(--border)] bg-[rgba(255,255,255,0.03)] text-left shadow-[0_18px_60px_-30px_rgba(0,0,0,0.6)] transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.02] ${slot.cardClass} ${isHero ? 'ring-1 ring-[rgba(199,166,110,0.25)]' : ''}`}
+                        >
+                          <Image
+                            src={item.image}
+                            alt={item.title}
+                            objectPosition={item.objectPosition ?? slot.imagePosition}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-full w-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,transparent_48%,rgba(0,0,0,0.38))]" />
+                          <div className="absolute inset-x-0 bottom-0 p-3 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                            <p className="text-[0.65rem] uppercase tracking-[0.28em] text-white/80">{item.category}</p>
+                          </div>
+                        </button>
+                      </Reveal>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
 
