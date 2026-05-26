@@ -15,14 +15,14 @@
 
 .light {
   color-scheme: light;
-  --background: 247 242 236;
-  --foreground: 21 18 16;
-  --surface: 255 252 248;
-  --surface-2: 238 231 222;
-  --muted: 111 99 88;
-  --border: 18 16 14 / 0.12;
-  --accent: 164 123 58;
-  --accent-foreground: 255 248 240;
+  --background: 249 246 241;
+  --foreground: 28 25 22;
+  --surface: 255 255 252;
+  --surface-2: 243 238 231;
+  --muted: 98 88 78;
+  --border: 40 32 24 / 0.10;
+  --accent: 145 104 48;
+  --accent-foreground: 255 250 244;
 }
 
 @theme inline {
@@ -61,6 +61,35 @@ body {
   background: rgb(var(--background));
   color: rgb(var(--foreground));
   font-family: var(--font-manrope), sans-serif;
+}
+
+.light html,
+.light body {
+  background:
+    radial-gradient(circle at top, rgba(145, 104, 48, 0.10), transparent 24%),
+    radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.65), transparent 18%),
+    linear-gradient(180deg, rgb(var(--background)), rgb(var(--background)));
+}
+
+.light .process-frame {
+  border-color: rgba(40, 32, 24, 0.10);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 244, 238, 0.82));
+  box-shadow: 0 30px 100px -58px rgba(65, 47, 28, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.light .process-focus:focus-visible {
+  box-shadow: 0 0 0 4px rgba(145, 104, 48, 0.12), 0 20px 60px -20px rgba(80, 58, 33, 0.20);
+}
+
+.light .process-segment {
+  color: rgb(var(--foreground));
+  border-color: rgba(40, 32, 24, 0.08);
+  box-shadow: 0 18px 36px rgba(120, 88, 56, 0.12), inset 0 -6px 18px rgba(255,255,255,0.36);
+}
+
+.light .process-segment:focus,
+.light .process-segment:hover {
+  box-shadow: 0 26px 46px rgba(120, 88, 56, 0.14), 0 1px 0 rgba(255,255,255,0.55) inset;
 }
 
 section {

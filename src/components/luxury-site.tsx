@@ -231,6 +231,15 @@ const stats = [
 
 const galleryFilters = ["All", "Residential", "Commercial", "Materials"] as const;
 
+const galleryCardLayouts = [
+  { cardClass: "xl:col-span-2 xl:row-span-2", imageClass: "h-[18rem] sm:h-[19rem] xl:h-[100%]" },
+  { cardClass: "", imageClass: "h-[22rem]" },
+  { cardClass: "xl:row-span-2", imageClass: "h-[20rem] sm:h-[21rem] xl:h-[100%]" },
+  { cardClass: "", imageClass: "h-[23rem]" },
+  { cardClass: "xl:col-span-2", imageClass: "h-[19rem] sm:h-[20rem]" },
+  { cardClass: "", imageClass: "h-[24rem]" },
+] as const;
+
 // Data for a luxury process clock
 const processClockData = [
   { zone: "Discovery", steps: ["Consultation", "Site Visit", "Moodboarding"] },
@@ -507,11 +516,19 @@ export function LuxurySite() {
   // debugVisual: show a small on-screen debug indicator for process scroll progress.
   const debugVisual = true;
 
+  const shellBackdrop = themeIsDark
+    ? "bg-[radial-gradient(circle_at_top,rgba(199,166,110,0.12),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.06),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent_22%,transparent_82%,rgba(10,10,10,0.1))]"
+    : "bg-[radial-gradient(circle_at_top,rgba(145,104,48,0.14),transparent_26%),radial-gradient(circle_at_80%_14%,rgba(255,255,255,0.65),transparent_18%),linear-gradient(180deg,rgba(255,255,255,0.72),rgba(255,255,255,0.18),transparent_80%,rgba(145,104,48,0.06))]";
+
+  const glassPanel = themeIsDark
+    ? "bg-[color:var(--background)]/55 shadow-[0_18px_60px_-30px_rgba(10,10,10,0.55)]"
+    : "bg-[rgba(255,255,255,0.76)] shadow-[0_18px_60px_-34px_rgba(90,64,35,0.18)]";
+
   return (
     <div className="relative isolate overflow-hidden bg-[color:var(--background)]">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(199,166,110,0.12),transparent_28%),radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.06),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent_22%,transparent_82%,rgba(10,10,10,0.1))]"
+        className={`pointer-events-none absolute inset-0 -z-10 ${shellBackdrop}`}
       />
       <motion.div
         aria-hidden
@@ -530,7 +547,7 @@ export function LuxurySite() {
         }`}
         aria-hidden={debugDisableOverlays}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-[color:var(--border)] bg-[color:var(--background)]/55 px-4 py-3 shadow-[0_18px_60px_-30px_rgba(10,10,10,0.55)] backdrop-blur-2xl">
+        <div className={`mx-auto flex max-w-7xl items-center justify-between rounded-full border border-[color:var(--border)] px-4 py-3 backdrop-blur-2xl ${glassPanel}`}>
           <button
             type="button"
             onClick={() => scrollToSection("home")}
@@ -606,7 +623,7 @@ export function LuxurySite() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -14 }}
               transition={{ duration: 0.25 }}
-              className="mx-auto mt-3 max-w-7xl rounded-[2rem] border border-[color:var(--border)] bg-[color:var(--background)]/92 p-4 shadow-[0_28px_80px_-40px_rgba(10,10,10,0.75)] backdrop-blur-2xl lg:hidden"
+              className={`mx-auto mt-3 max-w-7xl rounded-[2rem] border border-[color:var(--border)] p-4 backdrop-blur-2xl lg:hidden ${themeIsDark ? "bg-[color:var(--background)]/92 shadow-[0_28px_80px_-40px_rgba(10,10,10,0.75)]" : "bg-[rgba(255,255,255,0.84)] shadow-[0_28px_80px_-40px_rgba(90,64,35,0.16)]"}`}
             >
               <div className="grid gap-2">
                 {[
@@ -1133,27 +1150,37 @@ export function LuxurySite() {
               ))}
             </div>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {gallery.map((item, index) => (
-                <Reveal key={item.title} delay={index * 0.04}>
-                  <button
-                    type="button"
-                    onClick={() => setLightboxIndex(index)}
-                    className="group relative overflow-hidden rounded-[1.75rem] border border-[color:var(--border)] text-left"
-                  >
-                    <div className={`h-[23rem] bg-gradient-to-br ${item.accent}`} />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,rgba(10,10,10,0.84))]" />
-                    <div className="absolute inset-0 flex flex-col justify-end p-5">
-                      <div className="flex items-center justify-between text-xs uppercase tracking-[0.25em] text-white/65">
-                        <span>{item.category}</span>
-                        <ScanSearch className="h-4 w-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <div className="mt-6 grid auto-rows-[11rem] gap-4 md:grid-cols-2 xl:grid-cols-3 xl:grid-flow-dense">
+              {gallery.map((item, index) => {
+                const layout = galleryCardLayouts[index % galleryCardLayouts.length];
+                const galleryBorder = themeIsDark
+                  ? "border-[color:var(--border)]"
+                  : "border-[rgba(40,32,24,0.08)] bg-[rgba(255,255,255,0.72)] shadow-[0_24px_80px_-48px_rgba(90,64,35,0.14)]";
+                const galleryOverlay = themeIsDark
+                  ? "bg-[linear-gradient(180deg,transparent_30%,rgba(10,10,10,0.84))]"
+                  : "bg-[linear-gradient(180deg,transparent_34%,rgba(250,246,240,0.72))]";
+
+                return (
+                  <Reveal key={item.title} delay={index * 0.04}>
+                    <button
+                      type="button"
+                      onClick={() => setLightboxIndex(index)}
+                      className={`group relative overflow-hidden rounded-[1.75rem] border text-left transition-transform duration-300 hover:-translate-y-1 ${layout.cardClass} ${galleryBorder}`}
+                    >
+                      <div className={`bg-gradient-to-br ${item.accent} ${layout.imageClass}`} />
+                      <div className={`absolute inset-0 ${galleryOverlay}`} />
+                      <div className="absolute inset-0 flex flex-col justify-end p-5">
+                        <div className={`flex items-center justify-between text-xs uppercase tracking-[0.25em] ${themeIsDark ? "text-white/65" : "text-[color:var(--muted)]"}`}>
+                          <span>{item.category}</span>
+                          <ScanSearch className={`h-4 w-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${themeIsDark ? "text-white" : "text-[color:var(--foreground)]"}`} />
+                        </div>
+                        <h3 className={`mt-4 font-display text-3xl ${themeIsDark ? "text-white" : "text-[color:var(--foreground)]"}`}>{item.title}</h3>
+                        <p className={`mt-3 max-w-sm text-sm leading-7 ${themeIsDark ? "text-white/70" : "text-[color:var(--muted)]"}`}>{item.note}</p>
                       </div>
-                      <h3 className="mt-4 font-display text-3xl text-white">{item.title}</h3>
-                      <p className="mt-3 max-w-sm text-sm leading-7 text-white/70">{item.note}</p>
-                    </div>
-                  </button>
-                </Reveal>
-              ))}
+                    </button>
+                  </Reveal>
+                );
+              })}
             </div>
           </div>
 
