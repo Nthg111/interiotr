@@ -22,6 +22,7 @@ import {
   BadgeCheck,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   LayoutGrid,
   Mail,
   MapPinned,
@@ -443,6 +444,8 @@ export function LuxurySite() {
   const [selectedGalleryFilter, setSelectedGalleryFilter] = useState<(typeof galleryFilters)[number]>("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [split, setSplit] = useState(56);
+  const galleryScrollRef = useRef<HTMLDivElement | null>(null);
+  const [showGalleryScrollHint, setShowGalleryScrollHint] = useState(false);
   
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
@@ -506,6 +509,26 @@ export function LuxurySite() {
       ? source
       : source.filter((item) => item.category === selectedGalleryFilter);
   }, [selectedGalleryFilter, effectiveGallery]);
+
+  useEffect(() => {
+    const updateHintVisibility = () => {
+      const el = galleryScrollRef.current;
+      if (!el) {
+        setShowGalleryScrollHint(false);
+        return;
+      }
+
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+      const hasOverflow = el.scrollHeight - el.clientHeight > 18;
+      setShowGalleryScrollHint(isMobile && hasOverflow && el.scrollTop < 10);
+    };
+
+    updateHintVisibility();
+    window.addEventListener("resize", updateHintVisibility);
+    return () => {
+      window.removeEventListener("resize", updateHintVisibility);
+    };
+  }, [gallery]);
 
   useEffect(() => {
     if (!gallery.length) return;
@@ -1206,7 +1229,15 @@ export function LuxurySite() {
                   <div className="absolute -right-10 bottom-0 h-72 w-72 rounded-full bg-[rgba(255,255,255,0.06)] blur-3xl" />
                 </div>
 
-                <div className="relative grid h-full auto-rows-min grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 overflow-y-auto pr-2 sm:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] sm:gap-5 lg:grid-cols-[repeat(auto-fit,minmax(250px,1fr))] lg:gap-6">
+                <div
+                  ref={galleryScrollRef}
+                  onScroll={(event) => {
+                    if (event.currentTarget.scrollTop > 14) {
+                      setShowGalleryScrollHint(false);
+                    }
+                  }}
+                  className="relative grid h-full auto-rows-min grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-3 overflow-y-auto pr-2 sm:grid-cols-[repeat(auto-fit,minmax(190px,1fr))] sm:gap-4 lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] lg:gap-5"
+                >
                   {gallery.map((item, index) => {
                     const slot = galleryCircleLayouts[index % galleryCircleLayouts.length];
                     const isHero = index === 0;
@@ -1216,7 +1247,7 @@ export function LuxurySite() {
                         <button
                           type="button"
                           onClick={() => setLightboxIndex(index)}
-                          className={`group relative aspect-square overflow-hidden rounded-full border border-[color:var(--border)] bg-[rgba(255,255,255,0.03)] text-left shadow-[0_18px_60px_-30px_rgba(0,0,0,0.6)] transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.01] ${slot.cardClass} ${isHero ? 'ring-1 ring-[rgba(199,166,110,0.25)]' : ''}`}
+                          className={`group relative aspect-square overflow-hidden rounded-full border border-[color:var(--border)] bg-[rgba(255,255,255,0.03)] text-left shadow-[0_18px_60px_-30px_rgba(0,0,0,0.6)] transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.005] ${slot.cardClass} ${isHero ? 'ring-1 ring-[rgba(199,166,110,0.25)]' : ''}`}
                         >
                           <Image
                             src={item.image}
@@ -1224,7 +1255,7 @@ export function LuxurySite() {
                             objectPosition={item.objectPosition ?? slot.imagePosition}
                             loading="eager"
                             decoding="async"
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.08]"
                           />
                           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,transparent_48%,rgba(0,0,0,0.38))]" />
                           <div className="absolute inset-x-0 bottom-0 p-3 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -1235,6 +1266,25 @@ export function LuxurySite() {
                     );
                   })}
                 </div>
+
+                <AnimatePresence>
+                  {showGalleryScrollHint ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.25 }}
+                      className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex justify-center md:hidden"
+                    >
+                      <div className="rounded-full border border-white/20 bg-black/45 px-4 py-2 text-[0.65rem] uppercase tracking-[0.22em] text-white/90 backdrop-blur-xl shadow-[0_12px_35px_-18px_rgba(0,0,0,0.85)]">
+                        <span className="inline-flex items-center gap-1.5">
+                          <ChevronUp className="h-3.5 w-3.5" />
+                          Swipe up for more photos
+                        </span>
+                      </div>
+                    </motion.div>
+                  ) : null}
+                </AnimatePresence>
               </div>
             </div>
           </div>
