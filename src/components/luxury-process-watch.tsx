@@ -40,18 +40,18 @@ export default function LuxuryProcessWatch({ onOpen, activeMicro, onMicroHover }
   const [activeDetail, setActiveDetail] = useState<string | null>(null);
   const [view, setView] = useState<'dashboard' | 'detail'>('dashboard');
 
-  const MAJORS = [
-    { key: 'Consultation', detail: majorInfo[0].detail },
-    { key: 'Design', detail: majorInfo[1].detail },
-    { key: 'Execution', detail: majorInfo[2].detail },
-    { key: 'Delivery', detail: majorInfo[3].detail },
-  ];
-
   const majorInfo = [
     { title: 'Consultation', detail: 'We start with you — understanding needs, preferences, and the essence of your space.' },
     { title: 'Design', detail: 'Concept exploration, space planning and 3D visualisation.' },
     { title: 'Execution', detail: 'Site execution, coordination and quality control.' },
     { title: 'Delivery', detail: 'Final handover, styling, and walkthrough.' },
+  ];
+
+  const MAJORS = [
+    { key: 'Consultation', detail: majorInfo[0].detail },
+    { key: 'Design', detail: majorInfo[1].detail },
+    { key: 'Execution', detail: majorInfo[2].detail },
+    { key: 'Delivery', detail: majorInfo[3].detail },
   ];
 
   useEffect(() => {
