@@ -779,13 +779,13 @@ export function LuxurySite() {
                         {item.label}
                       </p>
                       {item.label === "Material Categories" && (
-                        <div className="mt-4 block md:hidden">
-                          <picture className="w-full h-40 rounded-lg overflow-hidden">
+                        <div className="mt-3 block md:hidden">
+                          <picture className="mx-auto h-32 w-full max-w-[12.5rem] overflow-hidden rounded-xl sm:h-36 sm:max-w-[14rem]">
                             <source srcSet="/dheeraj-images/ai.png" type="image/png" />
                             <img
                               src="/dheeraj-images/ai.svg"
                               alt="Material categories"
-                              className="w-full h-full object-cover"
+                              className="h-full w-full object-cover object-center"
                             />
                           </picture>
                         </div>
