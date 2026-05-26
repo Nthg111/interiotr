@@ -227,12 +227,12 @@ const galleryCardLayouts = [
 ] as const;
 
 const galleryCircleLayouts = [
-  { cardClass: "col-span-2 row-span-2 md:col-span-2 md:row-span-2 lg:col-span-2 lg:row-span-2", imagePosition: "center 100%" },
-  { cardClass: "col-span-1 row-span-1 md:col-span-1 md:row-span-1", imagePosition: "center center" },
-  { cardClass: "col-span-1 row-span-1 md:col-span-1 md:row-span-2", imagePosition: "center 72%" },
-  { cardClass: "col-span-1 row-span-1 md:col-span-1 md:row-span-1", imagePosition: "center 40%" },
-  { cardClass: "col-span-2 row-span-1 md:col-span-2 md:row-span-1", imagePosition: "center 84%" },
-  { cardClass: "col-span-1 row-span-1 md:col-span-1 md:row-span-1", imagePosition: "center 56%" },
+  { cardClass: "sm:col-span-2 sm:row-span-2", imagePosition: "center 100%" },
+  { cardClass: "sm:col-span-1 sm:row-span-1", imagePosition: "center center" },
+  { cardClass: "sm:col-span-1 sm:row-span-2", imagePosition: "center 72%" },
+  { cardClass: "sm:col-span-1 sm:row-span-1", imagePosition: "center 40%" },
+  { cardClass: "sm:col-span-2 sm:row-span-1", imagePosition: "center 84%" },
+  { cardClass: "sm:col-span-1 sm:row-span-1", imagePosition: "center 56%" },
 ] as const;
 
 // Data for a luxury process clock
@@ -506,6 +506,23 @@ export function LuxurySite() {
       ? source
       : source.filter((item) => item.category === selectedGalleryFilter);
   }, [selectedGalleryFilter, effectiveGallery]);
+
+  useEffect(() => {
+    if (!gallery.length) return;
+
+    const preloadedImages = gallery.map((item) => {
+      const image = new window.Image();
+      image.decoding = "async";
+      image.src = item.image;
+      return image;
+    });
+
+    return () => {
+      preloadedImages.forEach((image) => {
+        image.src = "";
+      });
+    };
+  }, [gallery]);
 
   useEffect(() => {
     // Toggle this to re-enable smooth scrolling during debugging.
@@ -1189,7 +1206,7 @@ export function LuxurySite() {
                   <div className="absolute -right-10 bottom-0 h-72 w-72 rounded-full bg-[rgba(255,255,255,0.06)] blur-3xl" />
                 </div>
 
-                <div className="relative grid h-full auto-rows-min grid-cols-2 gap-3 overflow-y-auto pr-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+                <div className="relative grid h-full auto-rows-min grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 overflow-y-auto pr-2 sm:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] sm:gap-5 lg:grid-cols-[repeat(auto-fit,minmax(250px,1fr))] lg:gap-6">
                   {gallery.map((item, index) => {
                     const slot = galleryCircleLayouts[index % galleryCircleLayouts.length];
                     const isHero = index === 0;
@@ -1199,7 +1216,7 @@ export function LuxurySite() {
                         <button
                           type="button"
                           onClick={() => setLightboxIndex(index)}
-                          className={`group relative aspect-square overflow-hidden rounded-full border border-[color:var(--border)] bg-[rgba(255,255,255,0.03)] text-left shadow-[0_18px_60px_-30px_rgba(0,0,0,0.6)] transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.02] ${slot.cardClass} ${isHero ? 'ring-1 ring-[rgba(199,166,110,0.25)]' : ''}`}
+                          className={`group relative aspect-square overflow-hidden rounded-full border border-[color:var(--border)] bg-[rgba(255,255,255,0.03)] text-left shadow-[0_18px_60px_-30px_rgba(0,0,0,0.6)] transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.01] ${slot.cardClass} ${isHero ? 'ring-1 ring-[rgba(199,166,110,0.25)]' : ''}`}
                         >
                           <Image
                             src={item.image}
