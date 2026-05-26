@@ -72,6 +72,8 @@ type GalleryItem = {
   note: string;
   accent: string;
   image: string;
+  layoutCardClass?: string;
+  imageClass?: string;
 };
 
 const services: Service[] = [
@@ -190,6 +192,8 @@ const galleryItems: GalleryItem[] = [
     note: "Dramatic stone surfaces and soft light for a refined first impression.",
     accent: "from-stone-950 via-zinc-700 to-amber-900",
     image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.28.44 PM (1).jpeg",
+    layoutCardClass: "",
+    imageClass: "h-[22rem]",
   },
   {
     title: "Warm Wood Suite",
@@ -197,6 +201,8 @@ const galleryItems: GalleryItem[] = [
     note: "Natural grain, layered drapery, and tailored geometry for quiet luxury.",
     accent: "from-amber-950 via-stone-800 to-neutral-600",
     image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.28.44 PM (2).jpeg",
+    layoutCardClass: "xl:row-span-2",
+    imageClass: "h-[24rem]",
   },
   {
     title: "Acrylic Study Wall",
@@ -204,6 +210,8 @@ const galleryItems: GalleryItem[] = [
     note: "A close study of finishes, textures, and surface depth under soft lighting.",
     accent: "from-zinc-950 via-stone-700 to-neutral-500",
     image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.28.44 PM.jpeg",
+    layoutCardClass: "",
+    imageClass: "h-[22rem]",
   },
   {
     title: "Chef Kitchen Detail",
@@ -211,6 +219,8 @@ const galleryItems: GalleryItem[] = [
     note: "Modular precision balanced with warm task lighting and seamless detailing.",
     accent: "from-neutral-950 via-stone-700 to-amber-800",
     image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.28.45 PM.jpeg",
+    layoutCardClass: "xl:row-span-2",
+    imageClass: "h-[24rem]",
   },
   {
     title: "Executive Lounge",
@@ -218,6 +228,8 @@ const galleryItems: GalleryItem[] = [
     note: "Muted palette, generous spacing, and controlled reflections across the room.",
     accent: "from-stone-900 via-neutral-700 to-zinc-500",
     image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.37.54 PM.jpeg",
+    layoutCardClass: "xl:row-span-2",
+    imageClass: "h-[24rem]",
   },
   {
     title: "Texture Sample Grid",
@@ -225,6 +237,8 @@ const galleryItems: GalleryItem[] = [
     note: "Plywood, veneer, and laminate combinations arranged for rapid selection.",
     accent: "from-amber-900 via-stone-700 to-neutral-500",
     image: "/dheeraj-images/WhatsApp Image 2026-05-23 at 10.37.55 PM.jpeg",
+    layoutCardClass: "",
+    imageClass: "h-[22rem]",
   },
 ];
 
@@ -1159,7 +1173,8 @@ export function LuxurySite() {
 
             <div className="mt-6 grid auto-rows-[11rem] gap-4 md:grid-cols-2 xl:grid-cols-3 xl:grid-flow-dense">
               {gallery.map((item, index) => {
-                const layout = galleryCardLayouts[index % galleryCardLayouts.length];
+                const baseLayout = galleryCardLayouts[index % galleryCardLayouts.length];
+                const layout = { cardClass: item.layoutCardClass ?? baseLayout.cardClass, imageClass: item.imageClass ?? baseLayout.imageClass };
                 const galleryBorder = themeIsDark
                   ? "border-[color:var(--border)]"
                   : "border-[rgba(40,32,24,0.08)] bg-[rgba(255,255,255,0.72)] shadow-[0_24px_80px_-48px_rgba(90,64,35,0.14)]";
