@@ -6,6 +6,7 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: "sm" | "md" | "lg";
 };
 
+// Button variants define the visual styling for each supported type.
 const variantStyles = {
   default:
     "bg-[color:var(--accent)] text-[color:var(--accent-foreground)] shadow-[0_20px_45px_-20px_rgba(199,166,110,0.7)] hover:-translate-y-0.5 hover:shadow-[0_24px_55px_-18px_rgba(199,166,110,0.85)]",
@@ -17,12 +18,14 @@ const variantStyles = {
     "bg-transparent text-[color:var(--foreground)] hover:bg-white/5",
 };
 
+// Size styles define button height and padding for the supported sizes.
 const sizeStyles = {
   sm: "h-10 px-4 text-sm",
   md: "h-12 px-5 text-sm",
   lg: "h-14 px-6 text-base",
 };
 
+// Reusable button component with variant and size props.
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", size = "md", type = "button", ...props }, ref) => {
     return (

@@ -7,6 +7,8 @@ type ThemeProviderProps = {
   children: ReactNode;
 };
 
+// ThemeProvider wraps the app with next-themes support, enabling
+// system color scheme detection and class-based theme toggling.
 export function ThemeProvider({ children }: ThemeProviderProps) {
   return (
     <NextThemesProvider

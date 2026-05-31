@@ -96,6 +96,7 @@ type GalleryManifestItem = {
   featured?: boolean;
 };
 
+// Service definitions displayed in the services section.
 const services: Service[] = [
   {
     title: "Interior Design",
@@ -244,6 +245,7 @@ const processClockData = [
 ];
 
 function ProcessClock({ onOpen, onActive, activeMicro, onMicroHover }: { onOpen: (i: number) => void; onActive?: (i: number) => void; activeMicro?: number | null; onMicroHover?: (i: number | null) => void }) {
+  // Motion and element refs for the animated process clock component.
   const prefersReducedMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const handRef = useRef<HTMLDivElement | null>(null);
@@ -361,10 +363,12 @@ function ProcessClock({ onOpen, onActive, activeMicro, onMicroHover }: { onOpen:
   );
 }
 
+// Smoothly scroll to a section by id when a navigation button is clicked.
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+// Reusable section header used across each major page section.
 function SectionShell({
   eyebrow,
   title,
@@ -389,6 +393,7 @@ function SectionShell({
   );
 }
 
+// Animate content into view with a subtle fade-up effect.
 function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const prefersReducedMotion = useReducedMotion();
   return (
@@ -403,6 +408,8 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   );
 }
 
+// MagneticButton adds a subtle cursor-following transform on hover
+// for a more interactive CTA experience.
 function MagneticButton({
   className,
   children,
